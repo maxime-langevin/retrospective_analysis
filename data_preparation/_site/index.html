@@ -13,7 +13,7 @@
 
 <title>Data preparation</title>
 
-<script src="site_libs/header-attrs-2.18/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.23/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
@@ -29,7 +29,7 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
-<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
@@ -1128,7 +1128,7 @@ page</a>.</p>
 <div id="zoomed" class="section level6">
 <h6>zoomed</h6>
 <pre class="r"><code>knitr::include_graphics(&quot;source_data/2021_07_26/fig6_zoom.png&quot;)</code></pre>
-<p><img src="source_data/2021_07_26/fig6_zoom.png" width="236" style="display: block; margin: auto;" /></p>
+<p><img src="source_data/2021_07_26/fig6_zoom.png" style="display: block; margin: auto;" /></p>
 </div>
 <div id="all" class="section level6">
 <h6>all</h6>
@@ -1140,7 +1140,7 @@ page</a>.</p>
 <div id="zoomed-1" class="section level6">
 <h6>zoomed</h6>
 <pre class="r"><code>knitr::include_graphics(&quot;source_data/2021_07_26/fig5_zoom.png&quot;)</code></pre>
-<p><img src="source_data/2021_07_26/fig5_zoom.png" width="235" style="display: block; margin: auto;" /></p>
+<p><img src="source_data/2021_07_26/fig5_zoom.png" style="display: block; margin: auto;" /></p>
 </div>
 <div id="all-1" class="section level6">
 <h6>all</h6>
@@ -1929,12 +1929,12 @@ page</a>.</p>
 <div id="fig-3-zoomes" class="section level5">
 <h5>Fig 3 zoomes</h5>
 <pre class="r"><code>knitr::include_graphics(&quot;source_data/2021_07_26/2021_07_26_fig3_zoom.png&quot;)</code></pre>
-<p><img src="source_data/2021_07_26/2021_07_26_fig3_zoom.png" width="244" style="display: block; margin: auto;" /></p>
+<p><img src="source_data/2021_07_26/2021_07_26_fig3_zoom.png" style="display: block; margin: auto;" /></p>
 </div>
 <div id="fig-3-all" class="section level5">
 <h5>Fig 3 all</h5>
 <pre class="r"><code>knitr::include_graphics(&quot;source_data/2021_07_26/2021_07_26_fig3.png&quot;)</code></pre>
-<p><img src="source_data/2021_07_26/2021_07_26_fig3.png" width="372" style="display: block; margin: auto;" /></p>
+<p><img src="source_data/2021_07_26/2021_07_26_fig3.png" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="reproduced-12"
@@ -3037,6 +3037,159 @@ ggplot(ME) +
     subtitle = &quot;point: median scenario       error bar: range of all scenarios&quot;
   )</code></pre>
 <p><img src="index_files/figure-html/unnamed-chunk-60-1.svg" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+</div>
+<div id="other-figures-and-appendix"
+class="section level1 tabset tabset-fade tabset-pills">
+<h1 class="tabset tabset-fade tabset-pills">Other figures and
+appendix</h1>
+<div id="winter-2021-curfew-discussion" class="section level2">
+<h2>Winter 2021 curfew discussion</h2>
+<pre class="r"><code>#load Feb 14 scenario
+temp &lt;- read_csv(
+    &quot;source_data/appendix/2021_02_14/corrected_scenarios_new_hosp.csv&quot;
+    ) %&gt;%
+  select(-reality_report) %&gt;%
+  gather(scenario_type, value, -c(date, reality)) %&gt;%
+  mutate(
+    report_date = &quot;2021-02-14&quot;,
+    report = &quot;Feb 14, 2021&quot;
+    )
+#gather jan 16, Feb 2 and Feb 14 scenarios
+temp &lt;- bind_rows(
+  temp,
+  data_new_hosp %&gt;%
+    select(report, date, reality, scenario_type, value, report_date) %&gt;%
+    filter(report_date %in% c(&quot;2021-01-16&quot;, &quot;2021-02-02&quot;))
+)
+#order the reports for graph
+temp$report &lt;- factor(
+  temp$report,
+  levels = c(
+    &quot;Jan 16, 2021&quot;,
+    &quot;Feb 02, 2021&quot;, 
+    &quot;Feb 14, 2021&quot;
+  )
+)
+
+ggplot(temp) +
+  geom_line(
+    aes(date, value, group=scenario_type, color=&quot;scenarios&quot;), 
+    linewidth=1
+    ) +
+  geom_line(
+    data = reality_new_hosp_adm,
+    aes(date, new_hosp, color=&quot;reality&quot;), 
+    alpha=.2
+    ) +
+  geom_line(
+    data = reality_new_hosp_adm,
+    aes(date, new_hosp_smooth, color=&quot;reality&quot;), 
+    linewidth=1
+    ) +
+  geom_vline(data = temp, aes(xintercept = as.Date(report_date)), linetype=&quot;dashed&quot;) +
+  facet_wrap(vars(report), nrow=1)  +
+  scale_color_manual(values=c(&#39;#ff0000&#39;,&#39;#D8D8D8&#39;)) +
+  labs(
+    x=&quot;&quot;, y=&quot;hospital admissions&quot;, color=&quot;&quot;,
+    subtitle = &quot;vertical line: publication date&quot;
+  ) +
+  xlim(as.Date(&quot;2021-01-01&quot;), as.Date(&quot;2021-04-01&quot;))</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-61-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#save
+ggsave(#svg
+  &quot;../graphs/curfew_discussion.svg&quot;,
+  dpi=500, width=7, height=4, bg=&quot;white&quot;
+  )
+ggsave(#png
+  &quot;../graphs/curfew_discussion.png&quot;,
+  dpi=500, width=7, height=4, bg=&quot;white&quot;
+  )</code></pre>
+</div>
+<div id="illegitimate-comparisons"
+class="section level2 tabset tabset-fade">
+<h2 class="tabset tabset-fade">Illegitimate comparisons</h2>
+<div id="feb-02-2021" class="section level3">
+<h3>Feb 02, 2021</h3>
+<pre class="r"><code>temp &lt;- data_new_hosp %&gt;%
+  filter(report_date == &quot;2021-02-08&quot;)
+
+ggplot(temp) +
+  geom_line(
+    aes(date, value, group=scenario_type, color=&quot;scenarios&quot;), 
+    linewidth=1
+    ) +
+  geom_line(
+    data = reality_new_hosp_adm,
+    aes(date, new_hosp, color=&quot;reality&quot;), 
+    alpha=.2
+    ) +
+  geom_line(
+    data = reality_new_hosp_adm,
+    aes(date, new_hosp_smooth, color=&quot;reality&quot;), 
+    linewidth=1
+    ) +
+  geom_vline(data = temp, aes(xintercept = as.Date(report_date)), linetype=&quot;dashed&quot;) +
+  facet_wrap(vars(report), nrow=1)  +
+  scale_color_manual(values=c(&#39;#ff0000&#39;,&#39;#D8D8D8&#39;)) +
+  labs(
+    x=&quot;&quot;, y=&quot;hospital admissions&quot;, color=&quot;&quot;,
+    subtitle = &quot;vertical line: publication date&quot;
+  ) +
+  xlim(as.Date(&quot;2021-01-01&quot;), as.Date(&quot;2021-03-22&quot;)) +
+  theme(
+    legend.position = c(0.8, 0.2),
+    legend.background = element_rect(fill=&quot;transparent&quot;)
+    )</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-62-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#save
+ggsave(#svg
+  &quot;../graphs/legitimate_Feb_08_2021.svg&quot;,
+  dpi=500, width=2.5, height=2.5, bg=&quot;white&quot;
+  )
+ggsave(#png
+  &quot;../graphs/legitimate_Feb_08_2021.png&quot;,
+  dpi=500, width=2.5, height=2.5, bg=&quot;white&quot;
+  )</code></pre>
+</div>
+<div id="jan-07-2022" class="section level3">
+<h3>Jan 07, 2022</h3>
+<pre class="r"><code>temp &lt;- data_ICU_beds %&gt;%
+  filter(report_date == &quot;2022-01-07&quot;)
+
+ggplot(temp) +
+  geom_line(
+    aes(date, value, group=scenario_type, color=&quot;scenarios&quot;), 
+    linewidth=1
+    ) +
+  geom_line(
+    data = reality_ICU_beds,
+    aes(date, ICU_beds, color=&quot;reality&quot;), 
+    linewidth=1
+    ) +
+  geom_vline(data = temp, aes(xintercept = as.Date(report_date)), linetype=&quot;dashed&quot;) +
+  facet_wrap(vars(report), nrow=1)  +
+  scale_color_manual(values=c(&#39;#ff0000&#39;,&#39;#D8D8D8&#39;)) +
+  labs(
+    x=&quot;&quot;, y=&quot;hospital admissions&quot;, color=&quot;&quot;,
+    subtitle = &quot;vertical line: publication date&quot;
+  ) +
+  xlim(as.Date(&quot;2021-12-01&quot;), as.Date(&quot;2022-04-01&quot;)) +
+  theme(
+    legend.position = c(0.6, 0.2),
+    legend.background = element_rect(fill=&quot;transparent&quot;)
+    )</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-63-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#save
+ggsave(#svg
+  &quot;../graphs/legitimate_Jan_07_2022.svg&quot;,
+  dpi=500, width=2.5, height=2.5, bg=&quot;white&quot;
+  )
+ggsave(#png
+  &quot;../graphs/legitimate_Jan_07_2022.png&quot;,
+  dpi=500, width=2.5, height=2.5, bg=&quot;white&quot;
+  )</code></pre>
 </div>
 </div>
 </div>

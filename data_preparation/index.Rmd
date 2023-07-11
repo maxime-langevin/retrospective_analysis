@@ -2837,3 +2837,160 @@ ggplot(ME) +
   )
 ```
 
+
+# Other figures and appendix {.tabset .tabset-fade .tabset-pills}
+
+## Winter 2021 curfew discussion
+
+```{r}
+#load Feb 14 scenario
+temp <- read_csv(
+    "source_data/appendix/2021_02_14/corrected_scenarios_new_hosp.csv"
+    ) %>%
+  select(-reality_report) %>%
+  gather(scenario_type, value, -c(date, reality)) %>%
+  mutate(
+    report_date = "2021-02-14",
+    report = "Feb 14, 2021"
+    )
+#gather jan 16, Feb 2 and Feb 14 scenarios
+temp <- bind_rows(
+  temp,
+  data_new_hosp %>%
+    select(report, date, reality, scenario_type, value, report_date) %>%
+    filter(report_date %in% c("2021-01-16", "2021-02-02"))
+)
+#order the reports for graph
+temp$report <- factor(
+  temp$report,
+  levels = c(
+    "Jan 16, 2021",
+    "Feb 02, 2021", 
+    "Feb 14, 2021"
+  )
+)
+
+ggplot(temp) +
+  geom_line(
+    aes(date, value, group=scenario_type, color="scenarios"), 
+    linewidth=1
+    ) +
+  geom_line(
+    data = reality_new_hosp_adm,
+    aes(date, new_hosp, color="reality"), 
+    alpha=.2
+    ) +
+  geom_line(
+    data = reality_new_hosp_adm,
+    aes(date, new_hosp_smooth, color="reality"), 
+    linewidth=1
+    ) +
+  geom_vline(data = temp, aes(xintercept = as.Date(report_date)), linetype="dashed") +
+  facet_wrap(vars(report), nrow=1)  +
+  scale_color_manual(values=c('#ff0000','#D8D8D8')) +
+  labs(
+    x="", y="hospital admissions", color="",
+    subtitle = "vertical line: publication date"
+  ) +
+  xlim(as.Date("2021-01-01"), as.Date("2021-04-01"))
+
+#save
+ggsave(#svg
+  "../graphs/curfew_discussion.svg",
+  dpi=500, width=7, height=4, bg="white"
+  )
+ggsave(#png
+  "../graphs/curfew_discussion.png",
+  dpi=500, width=7, height=4, bg="white"
+  )
+```
+
+## Illegitimate comparisons {.tabset .tabset-fade}
+
+### Feb 02, 2021
+
+```{r}
+temp <- data_new_hosp %>%
+  filter(report_date == "2021-02-08")
+
+ggplot(temp) +
+  geom_line(
+    aes(date, value, group=scenario_type, color="scenarios"), 
+    linewidth=1
+    ) +
+  geom_line(
+    data = reality_new_hosp_adm,
+    aes(date, new_hosp, color="reality"), 
+    alpha=.2
+    ) +
+  geom_line(
+    data = reality_new_hosp_adm,
+    aes(date, new_hosp_smooth, color="reality"), 
+    linewidth=1
+    ) +
+  geom_vline(data = temp, aes(xintercept = as.Date(report_date)), linetype="dashed") +
+  facet_wrap(vars(report), nrow=1)  +
+  scale_color_manual(values=c('#ff0000','#D8D8D8')) +
+  labs(
+    x="", y="hospital admissions", color="",
+    subtitle = "vertical line: publication date"
+  ) +
+  xlim(as.Date("2021-01-01"), as.Date("2021-03-22")) +
+  theme(
+    legend.position = c(0.8, 0.2),
+    legend.background = element_rect(fill="transparent")
+    )
+
+
+#save
+ggsave(#svg
+  "../graphs/legitimate_Feb_08_2021.svg",
+  dpi=500, width=2.5, height=2.5, bg="white"
+  )
+ggsave(#png
+  "../graphs/legitimate_Feb_08_2021.png",
+  dpi=500, width=2.5, height=2.5, bg="white"
+  )
+```
+
+### Jan 07, 2022
+
+```{r}
+temp <- data_ICU_beds %>%
+  filter(report_date == "2022-01-07")
+
+ggplot(temp) +
+  geom_line(
+    aes(date, value, group=scenario_type, color="scenarios"), 
+    linewidth=1
+    ) +
+  geom_line(
+    data = reality_ICU_beds,
+    aes(date, ICU_beds, color="reality"), 
+    linewidth=1
+    ) +
+  geom_vline(data = temp, aes(xintercept = as.Date(report_date)), linetype="dashed") +
+  facet_wrap(vars(report), nrow=1)  +
+  scale_color_manual(values=c('#ff0000','#D8D8D8')) +
+  labs(
+    x="", y="hospital admissions", color="",
+    subtitle = "vertical line: publication date"
+  ) +
+  xlim(as.Date("2021-12-01"), as.Date("2022-04-01")) +
+  theme(
+    legend.position = c(0.6, 0.2),
+    legend.background = element_rect(fill="transparent")
+    )
+
+#save
+ggsave(#svg
+  "../graphs/legitimate_Jan_07_2022.svg",
+  dpi=500, width=2.5, height=2.5, bg="white"
+  )
+ggsave(#png
+  "../graphs/legitimate_Jan_07_2022.png",
+  dpi=500, width=2.5, height=2.5, bg="white"
+  )
+```
+
+
