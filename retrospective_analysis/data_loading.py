@@ -40,7 +40,6 @@ def load_dataframe(url, start_date=None, baseline=True, remove_na=True):
   except:
     pass
   df['reality'] = pd.to_numeric(df['reality'])
-  
   # start_date necessary to compute the Taylor-based baselines
   if start_date and baseline:
     df = add_baselines(df, start_date.replace('/', '-'))
