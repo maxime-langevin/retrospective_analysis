@@ -46,5 +46,5 @@ def load_dataframe(url, start_date=None, baseline=True, remove_na=True):
   if start_date and remove_na:
     df = df[df.index>start_date.replace('/', '-')]
   if remove_na:
-    df = df.dropna(subset=['low', 'median', 'high', 'reality'])
+    df = df.dropna(subset=['min', 'med', 'max', 'reality'])
   return df

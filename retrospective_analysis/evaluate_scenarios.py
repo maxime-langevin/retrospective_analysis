@@ -22,13 +22,13 @@ def evaluate_all_scenarios(urls, metrics, normalizations):
       normalization = normalizations[scenario]
       df = load_dataframe(url, start_date=scenario.replace('/', '-'))
       dict_results = {}
-      dict_results["Average uncertainty"] =  np.mean(df["high"]/normalization - df["low"]/normalization)
-      dict_results["Max uncertainty"] = np.max(df["high"]/normalization - df["low"]/normalization)
-      dict_results["Global accuracy"] = 100 * np.mean((df["reality"]<=df["high"]) & (df["reality"]>=df["low"]))
-      dict_results["MAE (median)"] = mean_absolute_error(df["reality"]/normalization, df["median"]/normalization)
-      dict_results["MAPE (median)"] = 100 * mean_absolute_percentage_error(df["reality"], df["median"])
-      dict_results["MAPE (optimist)"] = 100 * mean_absolute_percentage_error(df["reality"], df["low"])
-      dict_results["MAPE (pessimist)"] = 100 * mean_absolute_percentage_error(df["reality"], df["high"])
+      dict_results["Average uncertainty"] =  np.mean(df["max"]/normalization - df["min"]/normalization)
+      dict_results["Max uncertainty"] = np.max(df["max"]/normalization - df["min"]/normalization)
+      dict_results["Global accuracy"] = 100 * np.mean((df["reality"]<=df["max"]) & (df["reality"]>=df["min"]))
+      dict_results["MAE (median)"] = mean_absolute_error(df["reality"]/normalization, df["med"]/normalization)
+      dict_results["MAPE (median)"] = 100 * mean_absolute_percentage_error(df["reality"], df["med"])
+      dict_results["MAPE (optimist)"] = 100 * mean_absolute_percentage_error(df["reality"], df["min"])
+      dict_results["MAPE (pessimist)"] = 100 * mean_absolute_percentage_error(df["reality"], df["max"])
 
       results["Scenario: {}".format(scenario)] = list(dict_results.values())
   return pd.DataFrame.from_dict(results, orient='index', columns=column_names).round(1)
@@ -76,10 +76,10 @@ def evaluate_all_scenarios_with_dates(urls, metrics, normalizations, bins_length
 
           dict_results["Scenario"] = scenario
           dict_results["Scenario type"] = scenario_type
-          dict_results["Average uncertainty (beds)"] =  np.mean(df["high"].values[i*bins_length: min((i+1)*bins_length, len(df))]/normalization - df["low"].values[i*bins_length: min((i+1)*bins_length, len(df))]/normalization)
-          dict_results["Max uncertainty"] = np.max(df["high"].values[i*bins_length: min((i+1)*bins_length, len(df))]/normalization - df["low"].values[i*bins_length: min((i+1)*bins_length, len(df))]/normalization)
-          dict_results["Global accuracy"] = 100 * np.mean((df["reality"]<=df["high"]) & (df["reality"]>=df["low"]))
-          dict_results["MAE (median, beds)"] =  mean_absolute_error(df["reality"].values[i*bins_length: min((i+1)*bins_length, len(df))]/normalization, df["median"].values[i*bins_length: min((i+1)*bins_length, len(df))]/normalization)
+          dict_results["Average uncertainty (beds)"] =  np.mean(df["max"].values[i*bins_length: min((i+1)*bins_length, len(df))]/normalization - df["min"].values[i*bins_length: min((i+1)*bins_length, len(df))]/normalization)
+          dict_results["Max uncertainty"] = np.max(df["max"].values[i*bins_length: min((i+1)*bins_length, len(df))]/normalization - df["min"].values[i*bins_length: min((i+1)*bins_length, len(df))]/normalization)
+          dict_results["Global accuracy"] = 100 * np.mean((df["reality"]<=df["max"]) & (df["reality"]>=df["min"]))
+          dict_results["MAE (median, beds)"] =  mean_absolute_error(df["reality"].values[i*bins_length: min((i+1)*bins_length, len(df))]/normalization, df["med"].values[i*bins_length: min((i+1)*bins_length, len(df))]/normalization)
           dict_results["Period"] = f"{i*bins_length} days - {(i+1)*bins_length} days"
           
           results[f"Scenario: {scenario}, period: {i*bins_length} days - {(i+1)*bins_length} days".format(scenario)] = list(dict_results.values())
