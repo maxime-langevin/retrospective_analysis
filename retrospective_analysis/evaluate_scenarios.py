@@ -20,7 +20,12 @@ def evaluate_all_scenarios(urls, metrics, normalizations):
                   "MAPE (optimist)", "MAPE (pessimist)"]
   for i, (scenario, url) in enumerate(urls.items()):
       normalization = normalizations[scenario]
-      df = load_dataframe(url, start_date=scenario.replace('/', '-'))
+      if normalization == icu_normalization:
+        scenario_type = "ICU"
+      else:
+        scenario_type = "New hosp."
+      df = load_dataframe(url, start_date=scenario.split()[0].replace('/', '-'))
+      df = df.apply(pd.to_numeric)
       dict_results = {}
       dict_results["Average uncertainty"] =  np.mean(df["max"]/normalization - df["min"]/normalization)
       dict_results["Max uncertainty"] = np.max(df["max"]/normalization - df["min"]/normalization)
@@ -30,7 +35,7 @@ def evaluate_all_scenarios(urls, metrics, normalizations):
       dict_results["MAPE (optimist)"] = 100 * mean_absolute_percentage_error(df["reality"], df["min"])
       dict_results["MAPE (pessimist)"] = 100 * mean_absolute_percentage_error(df["reality"], df["max"])
 
-      results["Scenario: {}".format(scenario)] = list(dict_results.values())
+      results[f"Scenario: {scenario} {scenario_type}"] = list(dict_results.values())
   return pd.DataFrame.from_dict(results, orient='index', columns=column_names).round(1)
 
 
@@ -47,7 +52,12 @@ def compute_metrics_all_scenarios(urls, metrics, normalizations, scenario_name =
   
   for i, (scenario, url) in enumerate(urls.items()):
       normalization = normalizations[scenario]
-      df = load_dataframe(url, start_date=scenario.replace('/', '-'), baseline=baseline)
+      if normalization == icu_normalization:
+        scenario_type = "ICU"
+      else:
+        scenario_type = "New hosp."
+      df = load_dataframe(url, start_date=scenario.split()[0].replace('/', '-'))
+      df = df.apply(pd.to_numeric)
       if n_days:
         dict_results = compute_metrics(df.head(n_days), metrics=metrics, scenario_name = scenario_name, normalization=normalization)
         dict_results["Scenario_{}: {}".format(scenario_name, "MAPE")] = 100 * mean_absolute_percentage_error(df["reality"], df[scenario_name])
@@ -55,7 +65,7 @@ def compute_metrics_all_scenarios(urls, metrics, normalizations, scenario_name =
         dict_results = compute_metrics(df, metrics=metrics, scenario_name = scenario_name, normalization=normalization)
         dict_results["Scenario_{}: {}".format(scenario_name, "MAPE")] = 100 * mean_absolute_percentage_error(df["reality"], df[scenario_name])
     
-      results["Scenario: {}".format(scenario)] = list(dict_results.values())
+      results[f"Scenario: {scenario} {scenario_type}"] = list(dict_results.values())
   return pd.DataFrame.from_dict(results, orient='index', columns=column_names).round(1)
 
 
@@ -70,7 +80,8 @@ def evaluate_all_scenarios_with_dates(urls, metrics, normalizations, bins_length
       else:
         scenario_type = "New hosp."
       normalization = 1
-      df = load_dataframe(url, start_date=scenario.replace('/', '-'))
+      df = load_dataframe(url, start_date=scenario.split()[0].replace('/', '-'))
+      df = df.apply(pd.to_numeric)
       dict_results = {}
       for i in range(int(len(df)/bins_length)):
 
