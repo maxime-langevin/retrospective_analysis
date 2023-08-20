@@ -1,49 +1,49 @@
 ﻿,MAE,ME,Max Error,MAPE,endpoints,MAE (beds),Max error (beds),scenario
 Scenario: 2020/04/28 ICU ICU,3.8,-1.7,6.1,17.8,ICU,266.0,427.0,Optimist
 Scenario: 2020/10/30 ICU ICU,8.0,0.6,17.8,15.2,ICU,560.0,1246.0,Optimist
-Scenario: 2021/01/16 New hosp.,6.5,2.5,16.9,18.1,New hosp.,273.0,709.8,Optimist
-Scenario: 2021/02/02 New hosp.,8.4,8.4,19.4,24.1,New hosp.,352.8,814.8,Optimist
-Scenario: 2021/02/08 New hosp.,12.2,12.2,22.2,34.6,New hosp.,512.4,932.4,Optimist
-Scenario: 2021/02/23 New hosp.,14.6,-14.6,21.2,40.1,New hosp.,613.1999999999999,890.4,Optimist
-Scenario: 2021/04/26 New hosp.,6.2,6.2,7.9,52.9,New hosp.,260.40000000000003,331.8,Optimist
-Scenario: 2021/05/21 New hosp.,3.4,-3.4,4.1,43.0,New hosp.,142.79999999999998,172.2,Optimist
+Scenario: 2021/01/16 New hosp.,7.7,2.9,20.0,18.1,New hosp.,234.07999999999998,608.0,Optimist
+Scenario: 2021/02/02 New hosp.,10.0,10.0,23.0,24.1,New hosp.,304.0,699.1999999999999,Optimist
+Scenario: 2021/02/08 New hosp.,14.4,14.4,26.2,34.6,New hosp.,437.76,796.4799999999999,Optimist
+Scenario: 2021/02/23 New hosp.,17.3,-17.3,25.1,40.1,New hosp.,525.92,763.04,Optimist
+Scenario: 2021/04/26 New hosp.,7.3,7.3,9.3,52.9,New hosp.,221.92,282.72,Optimist
+Scenario: 2021/05/21 New hosp.,4.1,-4.1,4.8,43.0,New hosp.,124.63999999999999,145.92,Optimist
 Scenario: 2021/05/21 ICU ICU,8.8,-8.8,10.7,27.8,ICU,616.0,749.0,Optimist
 Scenario: 2021/07/26 ICU ICU,6.9,4.1,10.4,30.7,ICU,483.0,728.0,Optimist
-Scenario: 2021/07/26 New hosp.,11.9,11.9,18.0,119.3,New hosp.,499.8,756.0,Optimist
-Scenario: 2021/08/05 New hosp.,1.9,0.4,4.6,17.6,New hosp.,79.8,193.2,Optimist
+Scenario: 2021/07/26 New hosp.,14.1,14.1,21.3,119.3,New hosp.,428.64,647.52,Optimist
+Scenario: 2021/08/05 New hosp.,2.3,0.5,5.5,17.6,New hosp.,69.91999999999999,167.2,Optimist
 Scenario: 2021/08/05 ICU ICU,4.6,-4.6,9.2,20.4,ICU,322.0,644.0,Optimist
-Scenario: 2021/10/04 New hosp.,11.2,-11.2,28.4,82.9,New hosp.,470.4,1192.8,Optimist
-Scenario: 2022/01/07 New hosp.,18.9,18.9,30.2,33.0,New hosp.,793.8,1268.3999999999999,Optimist
+Scenario: 2021/10/04 New hosp.,13.2,-13.2,33.6,82.9,New hosp.,401.28,1021.4399999999999,Optimist
+Scenario: 2022/01/07 New hosp.,22.4,22.4,35.8,33.0,New hosp.,680.9599999999999,1088.32,Optimist
 Scenario: 2022/01/07 ICU ICU,10.6,10.2,19.7,29.7,ICU,742.0,1379.0,Optimist
 Scenario: 2020/04/28 ICU ICU,7.0,2.1,25.9,43.2,ICU,490.0,1813.0,Median
 Scenario: 2020/10/30 ICU ICU,19.0,19.0,25.8,35.0,ICU,1330.0,1806.0,Median
-Scenario: 2021/01/16 New hosp.,25.5,23.8,85.1,72.7,New hosp.,1071.0,3574.2,Median
-Scenario: 2021/02/02 New hosp.,23.3,23.3,48.8,67.3,New hosp.,978.6,2049.6,Median
-Scenario: 2021/02/08 New hosp.,20.6,20.6,31.5,59.4,New hosp.,865.2,1323.0,Median
-Scenario: 2021/02/23 New hosp.,11.4,-11.4,14.5,31.8,New hosp.,478.8,609.0,Median
-Scenario: 2021/04/26 New hosp.,12.0,12.0,15.2,115.4,New hosp.,504.0,638.4,Median
-Scenario: 2021/05/21 New hosp.,1.7,-1.3,3.3,17.9,New hosp.,71.39999999999999,138.6,Median
+Scenario: 2021/01/16 New hosp.,30.2,28.2,100.8,72.7,New hosp.,918.0799999999999,3064.3199999999997,Median
+Scenario: 2021/02/02 New hosp.,27.7,27.7,57.7,67.3,New hosp.,842.0799999999999,1754.08,Median
+Scenario: 2021/02/08 New hosp.,24.4,24.4,37.3,59.4,New hosp.,741.7599999999999,1133.9199999999998,Median
+Scenario: 2021/02/23 New hosp.,13.5,-13.5,17.2,31.8,New hosp.,410.4,522.88,Median
+Scenario: 2021/04/26 New hosp.,14.3,14.3,18.0,115.4,New hosp.,434.72,547.1999999999999,Median
+Scenario: 2021/05/21 New hosp.,2.0,-1.5,3.9,17.9,New hosp.,60.8,118.55999999999999,Median
 Scenario: 2021/05/21 ICU ICU,6.9,-6.9,8.0,20.9,ICU,483.0,560.0,Median
 Scenario: 2021/07/26 ICU ICU,32.7,30.7,61.1,138.0,ICU,2289.0,4277.0,Median
-Scenario: 2021/07/26 New hosp.,31.9,31.9,52.4,345.1,New hosp.,1339.8,2200.7999999999997,Median
-Scenario: 2021/08/05 New hosp.,22.3,22.3,30.7,234.6,New hosp.,936.6,1289.3999999999999,Median
+Scenario: 2021/07/26 New hosp.,37.8,37.8,62.1,345.1,New hosp.,1149.12,1887.84,Median
+Scenario: 2021/08/05 New hosp.,26.4,26.4,36.3,234.6,New hosp.,802.56,1103.5199999999998,Median
 Scenario: 2021/08/05 ICU ICU,19.8,19.8,28.3,82.5,ICU,1386.0,1981.0,Median
-Scenario: 2021/10/04 New hosp.,8.8,-8.8,22.3,66.2,New hosp.,369.6,936.6,Median
-Scenario: 2022/01/07 New hosp.,36.9,36.9,56.9,63.9,New hosp.,1549.8,2389.7999999999997,Median
+Scenario: 2021/10/04 New hosp.,10.5,-10.5,26.4,66.2,New hosp.,319.2,802.56,Median
+Scenario: 2022/01/07 New hosp.,43.7,43.7,67.4,63.9,New hosp.,1328.48,2048.96,Median
 Scenario: 2022/01/07 ICU ICU,22.0,21.8,42.4,60.0,ICU,1540.0,2968.0,Median
 Scenario: 2020/04/28 ICU ICU,23.1,18.4,94.4,166.9,ICU,1617.0,6608.0,Pessimist
 Scenario: 2020/10/30 ICU ICU,48.5,48.5,83.5,96.5,ICU,3395.0,5845.0,Pessimist
-Scenario: 2021/01/16 New hosp.,49.1,48.9,106.0,144.0,New hosp.,2062.2000000000003,4452.0,Pessimist
-Scenario: 2021/02/02 New hosp.,39.8,39.8,78.1,115.2,New hosp.,1671.6,3280.2,Pessimist
-Scenario: 2021/02/08 New hosp.,34.0,34.0,54.4,99.8,New hosp.,1428.0,2284.7999999999997,Pessimist
-Scenario: 2021/02/23 New hosp.,8.1,3.4,25.7,21.5,New hosp.,340.2,1079.3999999999999,Pessimist
-Scenario: 2021/04/26 New hosp.,19.7,19.7,32.5,206.0,New hosp.,827.4,1365.0,Pessimist
-Scenario: 2021/05/21 New hosp.,2.7,0.9,6.2,40.1,New hosp.,113.4,260.40000000000003,Pessimist
+Scenario: 2021/01/16 New hosp.,58.1,57.9,125.5,144.0,New hosp.,1766.24,3815.2,Pessimist
+Scenario: 2021/02/02 New hosp.,47.2,47.2,92.5,115.2,New hosp.,1434.88,2812.0,Pessimist
+Scenario: 2021/02/08 New hosp.,40.3,40.3,64.4,99.8,New hosp.,1225.12,1957.76,Pessimist
+Scenario: 2021/02/23 New hosp.,9.6,4.0,30.4,21.5,New hosp.,291.84,924.16,Pessimist
+Scenario: 2021/04/26 New hosp.,23.3,23.3,38.5,206.0,New hosp.,708.3199999999999,1170.3999999999999,Pessimist
+Scenario: 2021/05/21 New hosp.,3.2,1.0,7.4,40.1,New hosp.,97.28,224.96,Pessimist
 Scenario: 2021/05/21 ICU ICU,5.0,-5.0,7.1,14.9,ICU,350.0,497.0,Pessimist
 Scenario: 2021/07/26 ICU ICU,72.5,71.1,151.2,307.5,ICU,5075.0,10584.0,Pessimist
-Scenario: 2021/07/26 New hosp.,58.3,58.3,104.3,653.0,New hosp.,2448.6,4380.599999999999,Pessimist
-Scenario: 2021/08/05 New hosp.,34.6,34.6,49.6,371.4,New hosp.,1453.2,2083.2000000000003,Pessimist
+Scenario: 2021/07/26 New hosp.,69.0,69.0,123.5,653.0,New hosp.,2097.6,3754.3999999999996,Pessimist
+Scenario: 2021/08/05 New hosp.,41.0,41.0,58.7,371.4,New hosp.,1246.3999999999999,1784.48,Pessimist
 Scenario: 2021/08/05 ICU ICU,59.6,59.6,93.2,253.6,ICU,4172.0,6524.0,Pessimist
-Scenario: 2021/10/04 New hosp.,5.8,-5.8,11.9,49.4,New hosp.,243.6,499.8,Pessimist
-Scenario: 2022/01/07 New hosp.,54.3,54.3,86.7,93.7,New hosp.,2280.6,3641.4,Pessimist
+Scenario: 2021/10/04 New hosp.,6.8,-6.8,14.1,49.4,New hosp.,206.72,428.64,Pessimist
+Scenario: 2022/01/07 New hosp.,64.4,64.4,102.7,93.7,New hosp.,1957.76,3122.08,Pessimist
 Scenario: 2022/01/07 ICU ICU,32.9,32.7,65.8,86.7,ICU,2303.0,4606.0,Pessimist
