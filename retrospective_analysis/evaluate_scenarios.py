@@ -4,6 +4,7 @@ from retrospective_analysis.data_loading import load_dataframe
 from sklearn.metrics import mean_absolute_error, mean_absolute_percentage_error
 
 icu_normalization = 7000/100 
+idf_icu_normalization = 2600/100 
 
 def compute_metrics(df, metrics, scenario_name = "low", normalization=1):
   results = {}
@@ -20,7 +21,7 @@ def evaluate_all_scenarios(urls, metrics, normalizations):
                   "MAPE (optimist)", "MAPE (pessimist)"]
   for i, (scenario, url) in enumerate(urls.items()):
       normalization = normalizations[scenario]
-      if normalization == icu_normalization:
+      if normalization == icu_normalization or normalization == idf_icu_normalization:
         scenario_type = "ICU"
       else:
         scenario_type = "New hosp."
@@ -52,7 +53,7 @@ def compute_metrics_all_scenarios(urls, metrics, normalizations, scenario_name =
   
   for i, (scenario, url) in enumerate(urls.items()):
       normalization = normalizations[scenario]
-      if normalization == icu_normalization:
+      if normalization == icu_normalization or normalization == idf_icu_normalization:
         scenario_type = "ICU"
       else:
         scenario_type = "New hosp."
@@ -75,7 +76,7 @@ def evaluate_all_scenarios_with_dates(urls, metrics, normalizations, bins_length
   column_names = ["Scenario", "Scenario type", "Average uncertainty (beds)", "Max uncertainty", "Global accuracy", "MAE (median, beds)", "Period"]
   for i, (scenario, url) in enumerate(urls.items()):
       normalization = normalizations[scenario]
-      if normalization == icu_normalization:
+      if normalization == icu_normalization or normalization == idf_icu_normalization:
         scenario_type = "ICU"
       else:
         scenario_type = "New hosp."
