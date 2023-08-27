@@ -13,15 +13,15 @@ ENREGISTRER REALITY, LA COMBINAISON DE TOUS LES SCENARIOS
 
 MIEUX DE PRENDRE LE med = (max+min)/2 que le vrai med, pose problème quand bcp de scénarios multipliés ?
 
-This notebook prepares the data used in our analyses. 
+This notebook prepares the data used in our analyses.
 
 The first paragraph *Prepare reality data* focuses on true data of Intensive Care Units (ICU) and Hospitalizations. Most of it is from one of Pasteur Institutes's team paper ([Paireau et al 2022](https://www.pnas.org/doi/abs/10.1073/pnas.2103302119)), which has its own cleaning and smoothing process of the government raw data. This dataset stops on July 2021. Beyond this date we use data from multiple sources (Pasteur Institue's subsequent reports, government data) and combine them all to produce one unique and coherent dataset.
 
 Since Pasteur Institute's scenarios data were not public, we had to extract them manually from the reports figures, using [WebPlotDigitizer](https://apps.automeris.io/wpd/). The process for each report is described in the *Prepare Scenarios ICU* and *Prepare Scenarios Hospitalizations* paragraphs. For each report we indicate its original URL source. Then :
 
-  -   In the *Original* tab, we provide the screenshot of the original scenarios figures from which data are extracted.
-  -   In the *Reproduced* tab, we reproduce the original figures from our extracted data. In some rare cases, we horizontally or vertically offset the data for better alignment, based on comparison to reality data before report publication.
-  -   EST CE QUE JE LAISSE LE ERROR TAB ??
+-   In the *Original* tab, we provide the screenshot of the original scenarios figures from which data are extracted.
+-   In the *Reproduced* tab, we reproduce the original figures from our extracted data. In some rare cases, we horizontally or vertically offset the data for better alignment, based on comparison to reality data before report publication.
+-   EST CE QUE JE LAISSE LE ERROR TAB ??
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(message=F, warning=F, fig.align = "center",  dev='svg')
@@ -569,7 +569,6 @@ max_ICU_beds_IDF <- max(reality_ICU_beds_IDF$ICU_beds, na.rm=T)
 max_new_hosp <- max(reality_new_hosp_adm$new_hosp_smooth, na.rm=T)
 ```
 
-
 ## Prepare Scenarios ICU
 
 ```{r output_path_for_corrected_ICU_scenarios}
@@ -581,7 +580,7 @@ output_path_error <- "output_data/min_med_max_and_error/ICU_error/"
 
 Source: [Les Echos newspaper](https://www.lesechos.fr/idees-debats/editos-analyses/pourquoi-philippe-a-douche-les-francais-1199309), April 29, 2020. Specified "dated Tuesday", so we deduce that the publication dates from Tuesday April 28. Identified by Google search.
 
-#### Original 
+#### Original
 
 ```{r 2020_04_28_original, echo=FALSE, out.width="500px"}
 knitr::include_graphics("source_data/2020_04_28/2020_04_28.png")
@@ -646,7 +645,6 @@ f_graph_error(
 write_csv(error, paste0(output_path_error, "2020_04_28_ICU_error.csv"))
 ```
 
-
 ### October 30, 2020 {.tabset .tabset-fade .tabset-pills}
 
 Source: [Les Echos newspaper](https://www.lesechos.fr/economie-france/social/covid-la-decrue-dans-les-services-de-reanimation-esperee-en-france-dans-une-dizaine-de-jours-1261656), November 3, 2020. We know the publication date from the statement "The scientists from Pasteur Institute and Santé Publique France updated their epidemic scenarios on October 30". Identified by Google search.
@@ -710,7 +708,6 @@ f_graph_corrected(
 write_csv(temp, paste0(output_path, "2020_10_30_ICU.csv"))
 ```
 
-
 #### Error
 
 ```{r}
@@ -723,7 +720,6 @@ f_graph_error(
 
 write_csv(error, paste0(output_path_error, "2020_10_30_ICU_error.csv"))
 ```
-
 
 ### May 21 Scenarios {.tabset .tabset-fade .tabset-pills}
 
@@ -766,7 +762,6 @@ y_reality_offset <- 0
 x_scenarios_offset <- 0
 y_scenarios_offset <- 0
 ```
-
 
 ##### Before correction
 
@@ -821,7 +816,6 @@ f_graph_error(
 
 write_csv(error, paste0(output_path_error, "2021_05_21_ICU_error.csv"))
 ```
-
 
 ### July 26, 2021 {.tabset .tabset-fade .tabset-pills}
 
@@ -886,7 +880,7 @@ f_graph(
 ) 
 ```
 
-##### After correction 
+##### After correction
 
 ```{r }
 temp <- f_offset(
@@ -920,7 +914,6 @@ f_graph_error(
 write_csv(error, paste0(output_path_error, "2021_07_26_ICU_error.csv"))
 ```
 
-
 ### August 5, 2021 {.tabset .tabset-fade .tabset-pills}
 
 Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/variant/InstitutPasteur_Dynamiques_regionales_des_hospitalisations_20210805.pdf), August 5, 2021. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/delta-variant-dynamic/).
@@ -944,7 +937,6 @@ y_reality_offset <- 0
 x_scenarios_offset <- 0 
 y_scenarios_offset <- 80
 ```
-
 
 ##### Before correction
 
@@ -984,7 +976,6 @@ f_graph_corrected(
 write_csv(temp, paste0(output_path, "2021_08_05_ICU.csv"))
 ```
 
-
 #### Error
 
 ```{r}
@@ -997,7 +988,6 @@ f_graph_error(
 
 write_csv(error, paste0(output_path_error, "2021_08_05_ICU_error.csv"))
 ```
-
 
 ### January 7, 2022 {.tabset .tabset-fade .tabset-pills}
 
@@ -1028,7 +1018,6 @@ y_reality_offset <- 0
 x_scenarios_offset <- -1
 y_scenarios_offset <- 0
 ```
-
 
 ##### Before correction
 
@@ -1081,8 +1070,6 @@ f_graph_error(
 
 write_csv(error, paste0(output_path_error, "2022_01_07_ICU_error.csv"))
 ```
-
-
 
 ## Prepare Scenarios Hospitalizations
 
@@ -1283,7 +1270,6 @@ temp <- left_join(
 write_csv(temp, paste0(output_path, "2021_02_02_new_hosp.csv"))
 ```
 
-
 #### Error
 
 ```{r}
@@ -1296,7 +1282,6 @@ f_graph_error(
 
 write_csv(error, paste0(output_path_error, "2021_02_02_new_hosp_error.csv"))
 ```
-
 
 ### February 8, 2021 {.tabset .tabset-fade .tabset-pills}
 
@@ -1322,7 +1307,6 @@ knitr::include_graphics("source_data/2021_02_08/2021_02_08_fig6.png")
 knitr::include_graphics("source_data/2021_02_08/2021_02_08_fig7.png")
 ```
 
-
 #### Reproduced {.tabset .tabset-fade}
 
 We apply small -100 offset for the scenarios on the y axis for better alignment. The apparent discrepancy between the scenarios and the smoothed reality is not due to improper data extraction but is present in the modellers' report. Their scenarios matches the upper bound of the unsmoothed hospital admissions (see *Original* tab), as in our graph.
@@ -1334,7 +1318,6 @@ y_reality_offset <- 0
 x_scenarios_offset <- 0
 y_scenarios_offset <- -100
 ```
-
 
 ##### Before correction
 
@@ -1383,7 +1366,6 @@ temp <- temp %>% filter(date <= as.Date("2021-03-22"))
 write_csv(temp, paste0(output_path, "2021_02_08_new_hosp.csv"))
 ```
 
-
 #### Error
 
 ```{r}
@@ -1396,7 +1378,6 @@ f_graph_error(
 
 write_csv(error, paste0(output_path_error, "2021_02_08_new_hosp_error.csv"))
 ```
-
 
 ### February 23, 2021 {.tabset .tabset-fade .tabset-pills}
 
@@ -1427,7 +1408,6 @@ y_reality_offset <- 0
 x_scenarios_offset <- 0
 y_scenarios_offset <- 0
 ```
-
 
 ##### Before correction
 
@@ -1474,7 +1454,6 @@ temp <- temp %>% filter(date <= as.Date("2021-03-22")) #stop comparison before 3
 write_csv(temp, paste0(output_path, "2021_02_23_new_hosp.csv"))
 ```
 
-
 #### Error
 
 ```{r}
@@ -1487,7 +1466,6 @@ f_graph_error(
 
 write_csv(error, paste0(output_path_error, "2021_02_23_new_hosp_error.csv"))
 ```
-
 
 ### April 26, 2021 {.tabset .tabset-fade .tabset-pills}
 
@@ -1561,7 +1539,6 @@ temp <- temp %>% filter(date<=as.Date("2021-06-15")) #stop comparison mid-June b
 write_csv(temp,paste0(output_path, "2021_04_26_new_hosp.csv"))
 ```
 
-
 #### Error
 
 ```{r}
@@ -1574,7 +1551,6 @@ f_graph_error(
 
 write_csv(error, paste0(output_path_error, "2021_04_26_new_hosp_error.csv"))
 ```
-
 
 ### May 21, 2021 {.tabset .tabset-fade .tabset-pills}
 
@@ -1618,7 +1594,6 @@ x_scenarios_offset <- 0
 y_scenarios_offset <- 0
 ```
 
-
 ##### Before correction
 
 ```{r 2021_05_21_Pasteur_new_hosp}
@@ -1661,7 +1636,6 @@ temp <- temp %>% filter(date<=as.Date("2021-06-15")) #stop comparison mid-June b
 write_csv(temp, paste0(output_path, "2021_05_21_new_hosp.csv"))
 ```
 
-
 #### Error
 
 ```{r}
@@ -1675,15 +1649,13 @@ f_graph_error(
 write_csv(error, paste0(output_path_error, "2021_05_21_new_hosp_error.csv"))
 ```
 
-
-
 ### July 26, 2021 {.tabset .tabset-fade .tabset-pills}
 
 Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/variant/Institut_Pasteur_Acceleration_vaccination_et_Delta_20210726.pdf), July 26, 2021. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/delta-variant-dynamic/).
 
 #### Original {.tabset .tabset-fade}
 
-##### Fig 3 zoomes 
+##### Fig 3 zoomes
 
 ```{r}
 knitr::include_graphics("source_data/2021_07_26/2021_07_26_fig3_zoom.png")
@@ -1724,7 +1696,7 @@ f_graph(
 )
 ```
 
-##### After correction 
+##### After correction
 
 ```{r }
 temp <- f_offset(
@@ -1758,7 +1730,6 @@ f_graph_error(
 write_csv(error, paste0(output_path_error, "2021_07_26_new_hosp_error.csv"))
 ```
 
-
 ### August 5, 2021 {.tabset .tabset-fade .tabset-pills}
 
 Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/variant/InstitutPasteur_Dynamiques_regionales_des_hospitalisations_20210805.pdf), August 5, 2021. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/delta-variant-dynamic/).
@@ -1788,7 +1759,6 @@ y_reality_offset <- 0
 x_scenarios_offset <- 0 
 y_scenarios_offset <- 0
 ```
-
 
 ##### Before correction
 
@@ -1828,7 +1798,6 @@ f_graph_corrected(
 write_csv(temp, paste0(output_path, "2021_08_05_new_hosp.csv"))
 ```
 
-
 #### Error
 
 ```{r}
@@ -1841,8 +1810,6 @@ f_graph_error(
 
 write_csv(error, paste0(output_path_error, "2021_08_05_new_hosp_error.csv"))
 ```
-
-
 
 ### October 4, 2021 {.tabset .tabset-fade .tabset-pills}
 
@@ -1867,7 +1834,6 @@ y_reality_offset <- 0
 x_scenarios_offset <- 0
 y_scenarios_offset <- 0
 ```
-
 
 ##### Before correction
 
@@ -1909,7 +1875,6 @@ temp <- temp %>% filter(date <= as.Date("2021-12-15")) #stop comparison before O
 write_csv(temp, paste0(output_path, "2021_10_04_new_hosp.csv"))
 ```
 
-
 #### Error
 
 ```{r}
@@ -1922,7 +1887,6 @@ f_graph_error(
 
 write_csv(error, paste0(output_path_error, "2021_10_04_new_hosp_error.csv"))
 ```
-
 
 ### January 7, 2022 {.tabset .tabset-fade .tabset-pills}
 
@@ -1953,7 +1917,6 @@ y_reality_offset <- 0
 x_scenarios_offset <- 0
 y_scenarios_offset <- 0
 ```
-
 
 ##### Before correction
 
@@ -2475,7 +2438,6 @@ ggsave(#png
   )
 ```
 
-
 ## All errors grouped {.tabset .tabset-fade .tabset-pills}
 
 ```{r}
@@ -2600,7 +2562,6 @@ ggplot(
   ylim(-100, 150) + xlim(-20, NA)
 ```
 
-
 ## Individual report and error {.tabset .tabset-fade .tabset-pills}
 
 ### Individual Comparison {.tabset .tabset-fade}
@@ -2659,8 +2620,6 @@ ggplot(data_new_hosp) +
   ) 
 ```
 
-
-
 ### Error {.tabset .tabset-fade .tabset-pills}
 
 #### ICU
@@ -2694,7 +2653,6 @@ ggplot(data_new_hosp) +
     color=""
   )
 ```
-
 
 ## Cumulative Error {.tabset .tabset-fade .tabset-pills}
 
@@ -2836,7 +2794,6 @@ ggplot(ME) +
     subtitle = "point: median scenario       error bar: range of all scenarios"
   )
 ```
-
 
 # Other figures and appendix {.tabset .tabset-fade .tabset-pills}
 
@@ -2992,5 +2949,3 @@ ggsave(#png
   dpi=500, width=2.5, height=2.5, bg="white"
   )
 ```
-
-
