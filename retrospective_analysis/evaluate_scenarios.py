@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from retrospective_analysis.data_loading import load_dataframe
+from retrospective_analysis.data_loading import load_dataframe, moving_average
 from sklearn.metrics import mean_absolute_error, mean_absolute_percentage_error
 
 icu_normalization = 7000/100 
@@ -19,7 +19,7 @@ def evaluate_all_scenarios(urls, metrics, normalizations):
   column_names = list(metrics.keys())
   column_names = ["Average uncertainty", "Max uncertainty", "Global accuracy", "MAE (median)",
                   "MAE (optimist)", "MAE (pessimist)", "MAPE (median)", 
-                  "MAPE (optimist)", "MAPE (pessimist)"]
+                  "MAPE (optimist)", "MAPE (pessimist)", "Increasing"]
   for i, (scenario, url) in enumerate(urls.items()):
       normalization = normalizations[scenario]
       if normalization == icu_normalization or normalization == idf_icu_normalization:
@@ -33,12 +33,12 @@ def evaluate_all_scenarios(urls, metrics, normalizations):
       dict_results["Max uncertainty"] = np.max(df["max"]/normalization - df["min"]/normalization)
       dict_results["Global accuracy"] = 100 * np.mean((df["reality"]<=df["max"]) & (df["reality"]>=df["min"]))
       dict_results["MAE (median)"] = mean_absolute_error(df["reality"]/normalization, df["med"]/normalization)
-      dict_results["MAE (optimist)"] = mean_absolute_error(df["reality"], df["min"])
-      dict_results["MAE (pessimist)"] = mean_absolute_error(df["reality"], df["max"])
+      dict_results["MAE (optimist)"] = mean_absolute_error(df["reality"]/normalization, df["min"]/normalization)
+      dict_results["MAE (pessimist)"] = mean_absolute_error(df["reality"]/normalization, df["max"]/normalization)
       dict_results["MAPE (median)"] = 100 * mean_absolute_percentage_error(df["reality"], df["med"])
       dict_results["MAPE (optimist)"] = 100 * mean_absolute_percentage_error(df["reality"], df["min"])
       dict_results["MAPE (pessimist)"] = 100 * mean_absolute_percentage_error(df["reality"], df["max"])
-
+      dict_results["Increasing"] = moving_average(df["reality"].values)[0]<moving_average(df["reality"].values)[7] 
       results[f"Scenario: {scenario} {scenario_type}"] = list(dict_results.values())
   return pd.DataFrame.from_dict(results, orient='index', columns=column_names).round(1)
 
