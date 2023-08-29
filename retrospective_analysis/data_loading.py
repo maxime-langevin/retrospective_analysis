@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd 
 
 # needed to smooth out day-to-day variations 
-def moving_average(x, w):
+def moving_average(x, w=7):
     return np.convolve(x, np.ones(w), 'valid') / w
 
 def add_baselines(df, start_date):
