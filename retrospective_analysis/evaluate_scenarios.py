@@ -14,7 +14,7 @@ def compute_metrics(df, metrics, scenario_name = "low", normalization=1):
     results["Scenario_{}: {}".format(scenario_name, metric_name)] = metric(df["reality"]/normalization, df[scenario_name]/normalization)
   return results 
 
-def evaluate_all_scenarios(urls, metrics, normalizations):
+def evaluate_all_scenarios(urls, metrics, normalizations, increasing):
   results = {}
   column_names = list(metrics.keys())
   column_names = ["Average uncertainty (beds)", "MAE (median, beds)", "MAE (low, beds)", "MAE (high, beds)",
@@ -41,7 +41,7 @@ def evaluate_all_scenarios(urls, metrics, normalizations):
       dict_results["MAPE (median)"] = 100 * mean_absolute_percentage_error(df["reality"], df["med"])
       dict_results["MAPE (optimist)"] = 100 * mean_absolute_percentage_error(df["reality"], df["min"])
       dict_results["MAPE (pessimist)"] = 100 * mean_absolute_percentage_error(df["reality"], df["max"])
-      dict_results["Increasing"] = moving_average(df["reality"].values)[0]<moving_average(df["reality"].values)[7] 
+      dict_results["Increasing"] = increasing[scenario]
       results[f"Scenario: {scenario} {scenario_type}"] = list(dict_results.values())
   return pd.DataFrame.from_dict(results, orient='index', columns=column_names).round(1)
 
@@ -76,13 +76,13 @@ def compute_metrics_all_scenarios(urls, metrics, normalizations, scenario_name =
   return pd.DataFrame.from_dict(results, orient='index', columns=column_names).round(1)
 
 
-def evaluate_all_scenarios_with_dates(urls, metrics, normalizations, bins_length=14):
+def evaluate_all_scenarios_with_dates(urls, metrics, normalizations, increasing, bins_length=14):
   results = {}
   column_names = list(metrics.keys())
   column_names = ["Scenario", "Scenario type", "Average uncertainty (beds)", "MAE (median, beds)", 
                   "MAE (low, beds)", "MAE (high, beds)", 
                   "Historical peak", "MAE (median)", "MAE (optimist)", "MAE (pessimist)", "MAPE (median)", 
-                  "MAPE (optimist)", "MAPE (pessimist)", "Increasing"
+                  "MAPE (optimist)", "MAPE (pessimist)", "Increasing",
                   "Period"]
   for i, (scenario, url) in enumerate(urls.items()):
       normalization = normalizations[scenario]
@@ -110,7 +110,7 @@ def evaluate_all_scenarios_with_dates(urls, metrics, normalizations, bins_length
           dict_results["MAPE (median)"] =  mean_absolute_error(df["reality"].values[i*bins_length: min((i+1)*bins_length, len(df))], df["med"].values[i*bins_length: min((i+1)*bins_length, len(df))])
           dict_results["MAPE (low)"] =  mean_absolute_error(df["reality"].values[i*bins_length: min((i+1)*bins_length, len(df))], df["min"].values[i*bins_length: min((i+1)*bins_length, len(df))])
           dict_results["MAPE (high)"] =  mean_absolute_error(df["reality"].values[i*bins_length: min((i+1)*bins_length, len(df))], df["max"].values[i*bins_length: min((i+1)*bins_length, len(df))]) 
-          dict_results["Increasing"] = moving_average(df["reality"].values)[0]<moving_average(df["reality"].values)[7] 
+          dict_results["Increasing"] = increasing[scenario]
           dict_results["Period"] = f"{i*bins_length} days - {(i+1)*bins_length} days"
           
           results[f"Scenario: {scenario}, period: {i*bins_length} days - {(i+1)*bins_length} days".format(scenario)] = list(dict_results.values())
