@@ -17,7 +17,7 @@ def compute_metrics(df, metrics, scenario_name = "low", normalization=1):
 def evaluate_all_scenarios(urls, metrics, normalizations):
   results = {}
   column_names = list(metrics.keys())
-  column_names = ["Average uncertainty", "Max uncertainty", "Global accuracy", "MAE (median)",
+  column_names = ["Average uncertainty", "MAE (median)",
                   "MAE (optimist)", "MAE (pessimist)", "MAPE (median)", 
                   "MAPE (optimist)", "MAPE (pessimist)", "Increasing"]
   for i, (scenario, url) in enumerate(urls.items()):
@@ -30,8 +30,6 @@ def evaluate_all_scenarios(urls, metrics, normalizations):
       df = df.apply(pd.to_numeric)
       dict_results = {}
       dict_results["Average uncertainty"] =  np.mean(df["max"]/normalization - df["min"]/normalization)
-      dict_results["Max uncertainty"] = np.max(df["max"]/normalization - df["min"]/normalization)
-      dict_results["Global accuracy"] = 100 * np.mean((df["reality"]<=df["max"]) & (df["reality"]>=df["min"]))
       dict_results["MAE (median)"] = mean_absolute_error(df["reality"]/normalization, df["med"]/normalization)
       dict_results["MAE (optimist)"] = mean_absolute_error(df["reality"]/normalization, df["min"]/normalization)
       dict_results["MAE (pessimist)"] = mean_absolute_error(df["reality"]/normalization, df["max"]/normalization)
