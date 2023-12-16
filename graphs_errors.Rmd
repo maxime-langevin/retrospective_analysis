@@ -43,6 +43,7 @@ library(tidyverse) #loads multiple packages (see https://tidyverse.tidyverse.org
 
 library(cowplot) #for plot_grid()
 library(ggbeeswarm) #for geom_beeswarm()
+library(ggnewscale) #to reset manual scale in ggplot when multiple fill scales
 
 #set theme for graphs
 theme_set(
@@ -57,6 +58,7 @@ theme_set(
 max_new_hosp <- 3036 #historical peak of new hospitalizations
 dpi_resolution <- 500 #default dpi resolution for our png graphs
 max_ICU_beds <- 6937 #historical peak of ICU beds
+max_ICU_beds_IDF <- 2668 #historical peak of ICU beds in ile de france region (for Apr 2020 scenario)
 ```
 
 # Prepare data
@@ -85,11 +87,18 @@ errors <-
     `Maximum Error (beds)` = `Max error (beds)`
     ) %>%
   mutate(
+    #report ID with date of publication
     scenario_ID = as.Date(gsub("Scenario: ", "", scenario_ID)),
+    #more explicit scenarios denomination
     scenario_type = case_when(
-      scenario_type == "Optimist" ~ "most\noptimistic",
-      scenario_type == "Pessimist" ~ "most\npessimistic",
+      scenario_type == "Optimist" ~ "best case",
+      scenario_type == "Pessimist" ~ "worst case",
       scenario_type == "Median" ~ "median"
+      ),
+    #more explicit endpoint name
+    endpoints = case_when(
+      endpoints=="ICU"~"Intensive Care Units",
+      endpoints=="New hosp."~"New Hospitalizations"
       )
     )
 
@@ -97,9 +106,9 @@ errors <-
 errors$scenario_type <- factor(
   errors$scenario_type,
   levels = c(
-    'most\npessimistic',
+    'worst case',
     'median',
-    'most\noptimistic'
+    'best case'
   )
 )
 
@@ -110,8 +119,8 @@ uncertainties <- read_csv('results/global_evaluation.csv') %>%
   select(`Average uncertainty`, `Max uncertainty`, scenario_ID) %>%
   mutate(
     endpoint = case_when(
-      grepl("ICU", scenario_ID) ~ "ICU",
-      grepl("New hosp.", scenario_ID) ~ "New hosp."
+      grepl("ICU", scenario_ID) ~ "Intensive Care Units",
+      grepl("New hosp.", scenario_ID) ~ "New Hospitalizations"
     ),
     scenario_ID = as.Date(gsub("Scenario: ", "", scenario_ID)),
   )
@@ -123,7 +132,11 @@ temporal <- read_csv('results/global_evaluation_dates.csv') %>%
     endpoint = `Scenario type`
     ) %>%
   mutate(
-    scenario_ID = as.Date(gsub("Scenario: ", "", scenario_ID))
+    scenario_ID = as.Date(gsub("Scenario: ", "", scenario_ID)),
+    endpoint = case_when(
+      endpoint=="ICU"~"Intensive Care Units",
+      endpoint=="New hosp."~"New Hospitalizations"
+      )
   ) %>%
   #change time point names from days to weeks
   filter(Period!="56 days - 70 days") %>% #to few points for this period
@@ -137,6 +150,28 @@ temporal <- read_csv('results/global_evaluation_dates.csv') %>%
     )
   )
 ```
+
+for April 2020 scenarios only in IDF, proportional factor to account for the fact that nb of beds is lower than at the national scale
+
+faire aussi pour data frame error pour MAE beds et Max error beds ?
+
+```{r}
+temporal$`Average uncertainty (beds)`[temporal$scenario_ID=="2020-04-28"] <- 
+  temporal$`Average uncertainty (beds)`[temporal$scenario_ID=="2020-04-28"]*max_ICU_beds/max_ICU_beds_IDF
+
+temporal$`Max uncertainty (beds)`[temporal$scenario_ID=="2020-04-28"] <- 
+  temporal$`Max uncertainty (beds)`[temporal$scenario_ID=="2020-04-28"]*max_ICU_beds/max_ICU_beds_IDF
+
+temporal$`MAE (low, beds)`[temporal$scenario_ID=="2020-04-28"] <- 
+  temporal$`MAE (low, beds)`[temporal$scenario_ID=="2020-04-28"]*max_ICU_beds/max_ICU_beds_IDF
+
+temporal$`MAE (median, beds)`[temporal$scenario_ID=="2020-04-28"] <- 
+  temporal$`MAE (median, beds)`[temporal$scenario_ID=="2020-04-28"]*max_ICU_beds/max_ICU_beds_IDF
+
+temporal$`MAE (high, beds)`[temporal$scenario_ID=="2020-04-28"] <- 
+  temporal$`MAE (high, beds)`[temporal$scenario_ID=="2020-04-28"]*max_ICU_beds/max_ICU_beds_IDF
+```
+
 
 functions used in the code: save_graphs (save png and pdf graphs)
 
@@ -281,7 +316,7 @@ rm(p1_no_legend, p2_no_legend, temp)
 
 ```{r MAPE_vs_MAE_ICU_alone}
 temp <- errors %>%
-  filter(endpoints=="ICU")
+  filter(endpoints=="Intensive Care Units")
 
 #create plot
 p1 <- insert_xaxis_grob(
@@ -303,7 +338,7 @@ rm(p1, p2, g1, temp)
 
 ```{r MAPE_vs_MAE_new_hosp_alone}
 temp <- errors %>%
-  filter(endpoints=="New hosp.")
+  filter(endpoints=="New Hospitalizations")
 
 #create plot
 p1 <- insert_xaxis_grob(
@@ -340,7 +375,7 @@ temp <- errors %>%
     )
 
 hline_dat = data.frame(
-  endpoints=c("ICU", "New hosp."),
+  endpoints=c("Intensive Care Units", "New Hospitalizations"),
   beds=c(max_ICU_beds, max_new_hosp)
   )
 
@@ -413,7 +448,7 @@ rm(g1_no_legend, g2)
 
 # Bias {.tabset .tabset-fade .tabset-pills}
 
-## Error bias (Mean Error) {.tabset .tabset-fade}
+## Error Bias (Mean Error) {.tabset .tabset-fade}
 
 when scenarios relate to both ICU and new hosp, we take the mean of the 2
 
@@ -428,9 +463,9 @@ temp <- errors %>%
     )
 temp$scenario_type <- fct_recode(
   temp$scenario_type, 
-  `most pessimistic scenario\nof report` = "most\npessimistic", 
-  `median scenario\nof report` = "median", 
-  `most optimistic scenario\nof report` = "most\noptimistic"
+  `worst case scenarios\nof reports` = "worst case", 
+  `median scenarios\nof reports` = "median", 
+  `best case scenarios\nof reports` = "best case"
   )
 
 (g1 <- ggplot(temp) +
@@ -492,7 +527,7 @@ TBD
 
 ## Self-assessment bias {.tabset .tabset-fade}
 
-changer le format des dates pour + lisible (comme sur qualitative graph)
+rajouter celui des cas ?
 
 ```{r tweak_reports_labels_for_better_display_on_graph}
 #small offset to position adjacent reports labels on x axis
@@ -539,7 +574,7 @@ g_self_assessment_bias <- function(
     #error line and points
     geom_pointrange(
       aes(
-        y=median, ymin=`most\noptimistic`, ymax=`most\npessimistic`, x=as.Date(scenario_ID), 
+        y=median, ymin=`best case`, ymax=`worst case`, x=as.Date(scenario_ID), 
         color=`Self-assessment by modelers`
         ),
       size=.4, linewidth=1, shape=16
@@ -573,7 +608,7 @@ g_self_assessment_bias <- function(
       ) + 
     scale_x_continuous(#labels of reports
       breaks = reports_date$positions,
-      labels = reports_date$labels
+      labels = format(reports_date$labels, format="%b %d, %Y")
     ) +
     coord_cartesian(
       xlim = c(as.Date("2020-04-20"), as.Date("2022-05-01")),
@@ -612,34 +647,16 @@ g_self_assessment_bias <- function(
 }
 ```
 
-### MAE
-
-attention à avril 2020 =\> normalement OK, checker avec max (quel max a-t-il pris ? devrait être 2668)
-
-rajouter celui des cas
-
-probleme il pas noramisé que MAE optimist et pessimist, alors que le median oui !!
-
 ```{r}
 temp <- read_csv('results/results_with_illegtimate_comparisons.csv') %>%
   rename(
     scenario_ID = Date,
     endpoints = Endpoint
   ) %>%
-  #normalise MAE
+  #for % on graph
   mutate(
     across(
-      c(`MAE (optimist)`, `MAE (pessimist)`),
-      ~case_when(
-        endpoints=="ICU"~.x/max_ICU_beds,
-        endpoints=="New hosp."~.x/max_new_hosp
-      )
-      )
-    ) %>%
-  #for % MAPE on graph
-  mutate(
-    across(
-      c(`MAPE (median)`, `MAPE (optimist)`, `MAPE (pessimist)`, `MAE (median)`),
+      c(`MAPE (median)`, `MAPE (optimist)`, `MAPE (pessimist)`, `MAE (median)`, `MAE (optimist)`, `MAE (pessimist)`, ),
       ~.x/100
       )
     ) %>%
@@ -652,14 +669,14 @@ temp <- read_csv('results/results_with_illegtimate_comparisons.csv') %>%
 temp$scenario_type = factor(temp$scenario_type)
 temp$scenario_type = fct_recode(
   temp$scenario_type,
-  median = "(median)", `most\noptimistic` = "(optimist)", `most\npessimistic` = "(pessimist)"
+  median = "(median)", `best case` = "(optimist)", `worst case` = "(pessimist)"
   )
 errors$scenario_type <- factor(
   errors$scenario_type,
   levels = c(
-    'most\npessimistic',
+    'worst case',
     'median',
-    'most\noptimistic'
+    'best case'
   )
 )
 
@@ -671,12 +688,13 @@ temp <- temp %>%
   
 ```
 
+### MAE
 
 ```{r self_assessment_bias_vs_MAE}
 g <- insert_yaxis_grob(
-  g_self_assessment_bias(temp, "Mean Absolute Error (%)", .05, 0.7, NA)[[1]] +
+  g_self_assessment_bias(temp, "Mean Absolute Error (%)", .05, 0.7, 1)[[1]] +
     labs(y="Mean Absolute Error\n(% of historical peak)"), 
-  g_self_assessment_bias(temp, "Mean Absolute Error (%)", .05, 0.7, NA)[[2]], 
+  g_self_assessment_bias(temp, "Mean Absolute Error (%)", .05, 0.7, 1)[[2]], 
   grid::unit(.1, "null"), position = "right"
   )
 (ggdraw(g))
@@ -736,12 +754,12 @@ y_arrow_ICU <- 6000
 y_arrow_hosp <- 2500
 
 hline_dat = data.frame(
-  endpoint=c("ICU", "New hosp."),
+  endpoint=c("Intensive Care Units", "New Hospitalizations"),
   beds=c(max_ICU_beds, max_new_hosp)
   )
 
 vline_dat = data.frame(
-  endpoint=c("ICU", "New hosp."),
+  endpoint=c("Intensive Care Units", "New Hospitalizations"),
   x=c(x_arrow, x_arrow),
   xend=c(x_arrow, x_arrow),
   y=c(0, 0),
@@ -750,7 +768,7 @@ vline_dat = data.frame(
 
 label_dat = data.frame(
   label=c("more\nuncertainty", "historical epidemic peak\n(April 2020)"),
-  endpoint=c("ICU", "ICU"),
+  endpoint=c("Intensive Care Units", "Intensive Care Units"),
   x=c(x_label_uncertain, x_label_peak),
   y=c(y_arrow_ICU, max_ICU_beds)
   )
@@ -868,9 +886,7 @@ rm(temp, hline_dat, vline_dat, x_arrow, x_label, x_label_peak, x_label_uncertain
 #     )
 ```
 
-# uncertainty vs error {.tabset .tabset-fade .tabset-pills}
-
-## ICU
+# Uncertainty vs Error {.tabset .tabset-fade .tabset-pills}
 
 ```{r}
 temp <- temporal %>%
@@ -879,128 +895,199 @@ temp <- temporal %>%
   ) %>%
   mutate(
     scenario_type=case_when(
-      scenario_type == "MAE (high, beds)" ~ "pessimist",
+      scenario_type == "MAE (high, beds)" ~ "worst case",
       scenario_type == "MAE (median, beds)" ~ "median",
-      scenario_type == "MAE (low, beds)" ~ "optimist"
+      scenario_type == "MAE (low, beds)" ~ "best case"
+    ),
+    `Average uncertainty (beds)` = case_when(
+      endpoint=="Intensive Care Units"~round(`Average uncertainty (beds)`/max_ICU_beds, 2),
+      endpoint=="New Hospitalizations"~round(`Average uncertainty (beds)`/max_new_hosp, 2),
+    ),
+    error = case_when(
+      endpoint=="Intensive Care Units"~round(error/max_ICU_beds, 2),
+      endpoint=="New Hospitalizations"~round(error/max_new_hosp, 2),
     )
-  ) %>%
-  filter(endpoint=="ICU")
-
-temp$scenario_type <- factor(
-  temp$scenario_type,
-  levels = c(
-    'pessimist',
-    'median',
-    'optimist'
-  )
-)
-
-axis_lim <- max(
-  max(temp$error), temp$`Average uncertainty (beds)`, max_ICU_beds
   )
 
-ggplot(temp) +
-  geom_point(aes(error, `Average uncertainty (beds)`, color=scenario_type)) +
-  facet_grid(endpoint~Period, scales="free_y") +
-  ylim(0, axis_lim) +
-  xlim(0, axis_lim) +
-  geom_vline(xintercept = max_new_hosp, linetype="dashed") +
-  geom_hline(yintercept = max_new_hosp, linetype="dashed") +
-  coord_flip() +
-  scale_color_viridis_d() +
-  geom_line(aes(error, `Average uncertainty (beds)`, group=scenario_ID), alpha=.4)
+#order scenarios types
+  temp$scenario_type <- factor(
+    temp$scenario_type,
+    levels = c(
+      'worst case',
+      'median',
+      'best case'
+      )
+    )
 
+g_uncert_vs_error <- function(data, axis_lim, x_label_accurate, y_label_accurate){
+  #data frame for background color
+  x <- seq(0, axis_lim, 0.01)
+  y <- seq(0, axis_lim, 0.01)
+  d1 <- expand.grid(x = x, y = y)
+  d1 <- d1 %>%
+    rowwise() %>%
+    mutate(
+      color= sqrt((x/2)^2+y^2)
+    )
+  
+  #labels (un)accurate and (un)certain
+  label_dat = data.frame(
+    label=c("unaccurate,\ncertain", "unaccurate,\nuncertain", "accurate,\ncertain", "accurate,\nuncertain"),
+    Period=c("0-2 weeks", "0-2 weeks", "0-2 weeks", "0-2 weeks"),
+    x=c(.01, axis_lim, x_label_accurate, axis_lim),
+    y=c(axis_lim, axis_lim, y_label_accurate, .01),
+    hjust=c(0, 1, 0, 1),
+    vjust=c(1, 1, 0, 0)
+    )
+  
+  
+  g <- ggplot(data) +
+    #the background gradient color
+    geom_raster(
+      data = d1,
+      aes(x, y, fill = color),
+      alpha=.5, show.legend = FALSE
+      ) +
+    scale_fill_gradientn(
+      colors = c("green", "green", "orange", "orange", "red", "red", "purple", "purple"),
+      values = c(0, .15, .3, .5,  .8, max(d1$color))/max(d1$color)
+      ) +
+    new_scale_fill() + #for new fill scale for points
+    #the lines gathering scenarios of a same report
+    geom_line(
+      aes(`Average uncertainty (beds)`, error, group=interaction(scenario_ID,endpoint)), 
+      alpha=.6, 
+      ) +
+    #points of scenarios
+    geom_point(
+      aes(`Average uncertainty (beds)`, error, fill=scenario_type), 
+      shape=21, size=2
+      ) +
+    scale_fill_viridis_d() + 
+    #the 4 period panes
+    facet_wrap(vars(Period), scales="free_y") +
+    #to have x and y axis intersect at 0 and % and +/- sign
+    scale_x_continuous (limits=c(0,axis_lim), expand=c(0,0), labels = scales::percent) +
+    scale_y_continuous(limits=c(0,axis_lim), expand=c(0,0), labels = scales::percent_format(prefix = "±")) +
+    labs(
+      x="Uncertainty of report\n(% of historical peak)",
+      y="Mean Absolute Error of scenario\n(% of historical peak)",
+      fill="scenario in report",
+      subtitle = "scenarios on same vertical line are issued from same report"
+    ) +
+    #labels (un)accurate and (un)certain
+    geom_text(
+      data = label_dat,
+      aes(x = x, y = y, label= label, hjust=hjust, vjust=vjust), 
+        fontface = "italic", family = "Times New Roman",
+        ) +
+    #to have bigger points in legend
+    guides(
+      fill = guide_legend(override.aes = list(size = 3))
+      ) +
+    #no vertical lines by default, add them
+    theme(
+      panel.grid.major.x = element_line() 
+    )
+  
+  return(g)
+}
+```
+
+
+## ICU
+
+```{r}
+g_uncert_vs_error(
+  temp %>% filter(endpoint=="Intensive Care Units"), 
+  1.5, #axis limit
+  .2, #x for label on bottom left
+  0 #y for label on bottom left
+  )
 ```
 
 ## new hosp
 
 ```{r}
-temp <- temporal %>%
-  gather(
-    scenario_type, value=error, `MAE (high, beds)`, `MAE (low, beds)`, `MAE (median, beds)`
-  ) %>%
-  mutate(
-    scenario_type=case_when(
-      scenario_type == "MAE (high, beds)" ~ "pessimist",
-      scenario_type == "MAE (median, beds)" ~ "median",
-      scenario_type == "MAE (low, beds)" ~ "optimist"
-    )
-  ) %>%
-  filter(endpoint=="New hosp.")
-
-temp$scenario_type <- factor(
-  temp$scenario_type,
-  levels = c(
-    'pessimist',
-    'median',
-    'optimist'
+g_uncert_vs_error(
+  temp %>% filter(endpoint=="New Hospitalizations"), 
+  1.2, #axis limit
+  .3, #x for label on bottom left
+  0 #y for label on bottom left
   )
-)
-
-axis_lim <- max(
-  max(temp$error), temp$`Average uncertainty (beds)`, max_new_hosp
-  )
-
-ggplot(temp) +
-  geom_point(aes(error, `Average uncertainty (beds)`, color=scenario_type)) +
-  facet_grid(endpoint~Period, scales="free_y") +
-  ylim(0, axis_lim) +
-  xlim(0, axis_lim) +
-  geom_vline(xintercept = max_new_hosp, linetype="dashed") +
-  geom_hline(yintercept = max_new_hosp, linetype="dashed") +
-  coord_flip() +
-  scale_color_viridis_d() +
-  geom_line(aes(error, `Average uncertainty (beds)`, group=scenario_ID), alpha=.4)
 ```
 
 ## all together
 
+When a report evaluates both ICU and New Hosp, we take the mean of the 2
+
+```{r}
+temp2 <- temp %>% 
+  group_by(
+    scenario_ID, scenario_type, Period
+  ) %>%
+  summarise(
+    `Average uncertainty (beds)` = mean(`Average uncertainty (beds)`), 
+    error = mean(error)
+  ) %>%
+  mutate(endpoint = "ICU and New Hosp")
+
+g_uncert_vs_error(
+  temp2, 
+  1.5, #axis limit
+  .3, #x for label on bottom left
+  0 #y for label on bottom left
+  )
+
+f_save_graph_pdf_png(
+  "graphs/errors_and_uncertainties/uncertainty_vs_error",
+  7, 5, 500
+)
+```
+
+
 # Error temporal
 
-A affiner, pour l'instant je n'ai que le MAE median
-
-si on avait le MAE du worst case scenario, on verrait que ça dépasse les 50% et s'approche des 100% souvent
-
-ATTENTION QUAND C'EST EN ABSOLU IL FAUT ENLEVER LE SCENARIO D'AVRIL OU LUI APPLIQUER UNE TRANSFORMATION PROPORTIONNELLE ICU_FRANCE/ICU_IDF
+c'est MAPE ou MAE ???
 
 ```{r}
 temp <- temporal %>%
   select(
     scenario_ID, endpoint, Period, 
-    `MAPE (median)` = `MAE (median, beds)`, 
-    `MAPE (most\npessimistic)` = `MAE (high, beds)`, 
-    `MAPE (most\noptimistic)` = `MAE (low, beds)`
+    `MAE (median)` = `MAE (median, beds)`, 
+    `MAE (worst\ncase)` = `MAE (high, beds)`, 
+    `MAE (best\ncase)` = `MAE (low, beds)`
     ) %>%
   gather(
-    key=indicator, value=beds, `MAPE (median)`, `MAPE (most\npessimistic)`, `MAPE (most\noptimistic)`
+    key=indicator, value=beds, `MAE (median)`, `MAE (worst\ncase)`, `MAE (best\ncase)`
     ) %>%
   separate(indicator, sep = " ", into=c("error_metric", "scenario_type")) 
 
 temp$scenario_type = factor(temp$scenario_type)
 temp$scenario_type = fct_recode(
   temp$scenario_type,
-  median = "(median)", `most\noptimistic` = "(most\noptimistic)", `most\npessimistic` = "(most\npessimistic)"
+  median = "(median)", `best case` = "(best\ncase)", `worst case` = "(worst\ncase)"
   )
 temp$scenario_type <- factor(
   temp$scenario_type,
   levels = c(
-    "most\npessimistic",
+    "worst case",
     "median",
-    "most\noptimistic"
+    "best case"
   )
 )
 
 hline_dat = data.frame(
-  endpoint=c("ICU", "New hosp."),
+  endpoint=c("Intensive Care Units", "New Hospitalizations"),
   beds=c(max_ICU_beds, max_new_hosp)
   )
 
 label_dat = data.frame(
-  label=c("", "", "historical epidemic peak\n(April 2020)"),
-  endpoint=c("ICU", "ICU", "ICU"),
-  scenario_type=unique(temp$scenario_type),
-  x=c(2, 2, 2),
-  y=c(max_ICU_beds, max_ICU_beds, max_ICU_beds)
+  label=c("historical epidemic peak\n(April 2020)"),
+  endpoint=c("Intensive Care Units"),
+  scenario_type=c("best case"),
+  x=c(4),
+  y=c(max_ICU_beds)
   )
 
 ggplot(temp) +
@@ -1045,7 +1132,7 @@ ggplot(temp) +
     ) +
   geom_text(
     data=label_dat,
-    aes(x=x, y=y, label=label),
+    aes(x=x, y=y, label=label), hjust=1,
     fontface = "italic", family = "Times New Roman",
     )
 

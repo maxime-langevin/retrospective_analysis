@@ -2030,7 +2030,32 @@ f_graph_error(
 write_csv(error, paste0(output_path_error, "2022_01_07_new_hosp_error.csv"))
 ```
 
+```{r}
+rm(x_reality_offset, x_scenarios_offset, y_reality_offset, y_scenarios_offset, day_offset)
+```
+
+
 # Results
+
+```{r save_functions}
+f_save_graph_pdf_png <- function(path_name, graph_width, graph_height, dpi_resolution){
+  #pdf
+  ggsave(
+    paste0(path_name, ".pdf"),
+    width=graph_width, height=graph_height, bg="white", 
+    device = cairo_pdf #devide cairo for Times New Roman font in pdf
+    )
+  #png
+  ggsave(
+    paste0(path_name, ".png"),
+    width=graph_width, height=graph_height, bg="white", 
+    dpi = dpi_resolution
+    )
+}
+
+#resolution of png graphs
+dpi_resolution <- 350
+```
 
 ## All reports grouped {.tabset .tabset-fade .tabset-pills}
 
@@ -2135,15 +2160,15 @@ rm(data_ICU_beds_IDF)
 max_error <- max(data_ICU_beds$error, na.rm = T)
 
 #date of the reports and number of reports
-report_dates <- data_frame(
+report_dates_ICU <- data_frame(
   report = unique(as.Date(data_ICU_beds$report)), #dates of reports
   place = report #to loaclize on x axis
 )
 #small offset to position summer 2021 reports
-report_dates$place[report_dates$place=="2021-07-26"] <- report_dates$place[report_dates$place=="2021-07-26"]-15
-report_dates$place[report_dates$place=="2021-08-05"] <- report_dates$place[report_dates$place=="2021-08-05"]+15
+report_dates_ICU$place[report_dates_ICU$place=="2021-07-26"] <- report_dates_ICU$place[report_dates_ICU$place=="2021-07-26"]-10
+report_dates_ICU$place[report_dates_ICU$place=="2021-08-05"] <- report_dates_ICU$place[report_dates_ICU$place=="2021-08-05"]+3
 #number of reports
-n_reports <- as.numeric(nrow(report_dates))
+n_reports <- as.numeric(nrow(report_dates_ICU))
   
 
 
@@ -2190,13 +2215,13 @@ data_ICU_beds$report <- factor(
 
 ```{r graph_all_ICU}
 #plot
-ggplot(data_ICU_beds) +
+g1 <- ggplot(data_ICU_beds) +
    #dates of reports on x axis
-  geom_rug(data = report_dates, aes(report)) +
+  geom_rug(data = report_dates_ICU, aes(report)) +
   #dates of reports on x axis
   scale_x_continuous(
-    breaks=report_dates$place,
-    labels=format(report_dates$report, format="%b %d, %Y")
+    breaks=report_dates_ICU$place,
+    labels=format(report_dates_ICU$report, format="%b %d, %Y")
     ) +
   theme(
     axis.text.x = element_text(angle = 45, hjust=1),
@@ -2227,7 +2252,7 @@ ggplot(data_ICU_beds) +
   ) +
   #reality national scale
   geom_line(
-    data=reality_ICU_beds %>% filter(date>=as.Date("2020-10-01")), 
+    data=reality_ICU_beds, 
     aes(date, ICU_beds, linetype="reality")) +
   #reality just in Ile-de-France region
   geom_line(
@@ -2236,34 +2261,48 @@ ggplot(data_ICU_beds) +
   #1st wave peak in France
   geom_hline(yintercept = max_ICU_beds, linetype="dashed") +
   annotate(
-    'text', x = as.Date("2020-03-01"), y = max_ICU_beds, label = "1st wave peak", 
-    color = "black", fontface = "italic", family = "Times New Roman", vjust=-.4, hjust=0
+    'text', x = as.Date("2021-04-15"), y = max_ICU_beds, label = "1st wave peak", 
+    color = "black", fontface = "italic", family = "Times New Roman", vjust=-.4
     ) + 
-  #Ile de France region limits
-  geom_rect(
-    aes(xmin = as.Date("2020-03-01"), xmax = as.Date("2020-08-01"), ymin = 0, ymax = 3000),
-    alpha=0, color="black", linetype="dashed", linewidth=.05
+  #Ile de France region graph limits
+  annotate(
+    "rect",
+    xmin = as.Date("2020-03-01"), xmax = as.Date("2020-08-01"), ymin = 0, ymax = 3300,
+    fill=alpha("white", .95), color=alpha("black", .5)
+    ) +
+  #IDF scenarios in front of white rectangle
+  geom_line(
+    data = data_ICU_beds %>% filter(report=="Apr 28, 2020"),
+    aes(date, value, group=interaction(scenario_type, report), color=abs(error)), 
+    linewidth=1.5
+    ) +
+  #reality just in Ile-de-France region
+  geom_line(
+    data=reality_ICU_beds_IDF %>% filter(date<as.Date("2020-07-01")), 
+    aes(date, ICU_beds)) +
+  #1st wave peak in Ile-de-France region
+  annotate(
+    "segment", 
+    y = max_ICU_beds_IDF, yend = max_ICU_beds_IDF, x = as.Date("2020-03-15"), xend = as.Date("2020-07-15"),
+    linetype="dashed"
     ) +
   annotate(
-    'text', x = as.Date("2020-05-15"), y = 3000, label = "Ile-de-France\nregion", 
-    color = "black", fontface = "italic", family = "Times New Roman", vjust=-.2
+    'text', x = as.Date("2020-08-01"), y = 3300, label = " IdF region", 
+    color = "black", fontface = "italic", family = "Times New Roman", vjust=-0.2, hjust=1, size=3.2
     ) + 
   labs(
     x = paste("publication dates of the", n_reports, "reports"),
     y="ICU beds\noccupied by COVID-patients", x="",
-    color="error of scenario\nas % of\n1st wave peak",
-    linetype=""
+    color=" error of scenario\n  as % of\n 1st wave peak",
+    linetype= ""
   ) 
+g1
 
 #save
-ggsave(#svg
-  "../graphs/all_ICU_scenarios_reality.svg",
-  dpi=500, width=7, height=4, bg="white"
-  )
-ggsave(#png
-  "../graphs/all_ICU_scenarios_reality.png",
-  dpi=500, width=7, height=4, bg="white"
-  )
+f_save_graph_pdf_png(
+  "../graphs/raw_comparisons/all_ICU_scenarios_reality",
+  7, 4, dpi_resolution
+)
 ```
 
 ### New hospitalizations
@@ -2287,20 +2326,20 @@ data_new_hosp <- data_new_hosp %>%
 max_error <- max(data_new_hosp$error, na.rm = T)
 
 #date of the reports
-report_dates <- data_frame(
+report_dates_hosp <- data_frame(
   report = unique(as.Date(data_new_hosp$report)),
   place = report #to loaclize on x axis
 )
 #small offset to position summer 2021 reports
-report_dates$place[report_dates$place=="2021-07-26"] <- report_dates$place[report_dates$place=="2021-07-26"]-10
-report_dates$place[report_dates$place=="2021-08-05"] <- report_dates$place[report_dates$place=="2021-08-05"]+3
+report_dates_hosp$place[report_dates_hosp$place=="2021-07-26"] <- report_dates_hosp$place[report_dates_hosp$place=="2021-07-26"]-10
+report_dates_hosp$place[report_dates_hosp$place=="2021-08-05"] <- report_dates_hosp$place[report_dates_hosp$place=="2021-08-05"]+3
 #small offset to position winter 2021 reports
-report_dates$place[report_dates$place=="2021-01-16"] <- report_dates$place[report_dates$place=="2021-01-16"]-10
-report_dates$place[report_dates$place=="2021-02-02"] <- report_dates$place[report_dates$place=="2021-02-02"]-5
-report_dates$place[report_dates$place=="2021-02-08"] <- report_dates$place[report_dates$place=="2021-02-08"]+10
-report_dates$place[report_dates$place=="2021-02-23"] <- report_dates$place[report_dates$place=="2021-02-23"]+15
+report_dates_hosp$place[report_dates_hosp$place=="2021-01-16"] <- report_dates_hosp$place[report_dates_hosp$place=="2021-01-16"]-10
+report_dates_hosp$place[report_dates_hosp$place=="2021-02-02"] <- report_dates_hosp$place[report_dates_hosp$place=="2021-02-02"]-5
+report_dates_hosp$place[report_dates_hosp$place=="2021-02-08"] <- report_dates_hosp$place[report_dates_hosp$place=="2021-02-08"]+10
+report_dates_hosp$place[report_dates_hosp$place=="2021-02-23"] <- report_dates_hosp$place[report_dates_hosp$place=="2021-02-23"]+15
 #number of reports
-n_reports <- as.numeric(nrow(report_dates))
+n_reports <- as.numeric(nrow(report_dates_hosp))
 
 
 
@@ -2345,14 +2384,13 @@ data_new_hosp$report <- factor(
 
 ```{r graph_all_new_hosp}
 #plot
-ggplot(data_new_hosp) +
+g2 <- ggplot(data_new_hosp) +
    #dates of reports on x axis
-  geom_rug(data = report_dates, aes(report)) +
+  geom_rug(data = report_dates_hosp, aes(report)) +
   #dates of reports on x axis
   scale_x_continuous(
-    breaks=report_dates$place,
-    labels=format(report_dates$report, format="%b %d, %Y"),
-    limits = c(as.Date("2021-01-01"), as.Date("2022-02-12"))
+    breaks=report_dates_hosp$place,
+    labels=format(report_dates_hosp$report, format="%b %d, %Y")
     ) +
   theme(
     axis.text.x = element_text(angle = 45, hjust=1),
@@ -2376,33 +2414,58 @@ ggplot(data_new_hosp) +
   #peak 1st wave
   geom_hline(yintercept = max_new_hosp, linetype="dashed") +
   annotate(
-    'text', x = as.Date("2021-04-15"), y = max_new_hosp, label = "1st wave peak", 
+    'text', x = as.Date("2020-04-15"), y = max_new_hosp, label = "1st wave peak", 
     color = "black", fontface = "italic", family = "Times New Roman", vjust=-.4, hjust=0
     ) + 
   labs(
     x = paste("publication dates of the", n_reports, "reports"),
     y="daily new hospital admissions\nrelated to COVID", x="",
-    color="error of scenario\nerror as % of\n1st wave peak",
+    color=" error of scenario\n  as % of\n 1st wave peak",
     linetype=""
   ) +
   ylim(0, 5500)
+g2
 
 #save
-ggsave(#svg
-  "../graphs/all_hosp_scenarios_reality.svg",
-  dpi=500, width=7, height=4, bg="white"
-  )
-ggsave(#png
-  "../graphs/all_hosp_scenarios_reality.png",
-  dpi=500, width=7, height=4, bg="white"
-  )
+f_save_graph_pdf_png(
+  "../graphs/raw_comparisons/all_hosp_scenarios_reality",
+  7, 4, dpi_resolution
+)
 ```
+
+### Both
+
+```{r graph_all_combined}
+p <- get_legend(g1)
+
+g1_b <- g1 +
+  theme(legend.position = "none") +
+  labs(x="", subtitle = "Intensive Care Units beds", y="") 
+g2_b <- g2 +
+  theme(legend.position = "none") +
+  labs(x="publication dates of the reports", subtitle = "New Hospital Admissions", y="") 
+
+plot_grid(
+  plot_grid(
+    g1_b, g2_b, labels = c("a", "b"), nrow=2
+  ),
+  p,
+  ncol = 2, rel_widths = c(.8, .2)
+)
+
+#save
+f_save_graph_pdf_png(
+  "../graphs/raw_comparisons/all_scenarios_reality",
+  8, 8, dpi_resolution
+)
+```
+
 
 ## Short-term changes
 
 In some cases the reports are published just a few weeks apart. In theses cases we compare the short-term changes in the scenarios dynamics. The 3 case studies are a) winter 2021, b) spring 2021, c) summer 2021.
 
-```{r}
+```{r short_term_changes}
 #function for short-term scenarios changes
 f_graph_short_term_changes <- 
   function(
@@ -2487,14 +2550,10 @@ plot_grid(
 )
 
 #save
-ggsave(#svg
-  "../graphs/short_term_changes.svg",
-  dpi=500, width=7, height=5, bg="white"
-  )
-ggsave(#png
-  "../graphs/short_term_changes.png",
-  dpi=500, width=8, height=5, bg="white"
-  )
+f_save_graph_pdf_png(
+  "../graphs/raw_comparisons/short_term_changes",
+  8, 5, dpi_resolution
+)
 ```
 
 
@@ -2717,149 +2776,6 @@ ggplot(data_new_hosp) +
   )
 ```
 
-
-## Cumulative Error {.tabset .tabset-fade .tabset-pills}
-
-### RMSE
-
-```{r}
-#RMSE Mean Error for each ICU report (optimist, median and pessimist scenario)
-rmse_ICU <- data_ICU_error %>%
-  group_by(report) %>%
-  filter(date>report) %>%
-  summarise(
-    optimist =  round(sqrt(sum(error_min^2)/length(which(!is.na(error_min))))),
-    median =  round(sqrt(sum(error_med^2)/length(which(!is.na(error_med))))),
-    pessimist =  round(sqrt(sum(error_max^2)/length(which(!is.na(error_max)))))
-  )
-#RMSE Mean Error for each hospital admissions report (optimist, median and pessimist scenario)
-rmse_hosp <- data_new_hosp_error %>%
-  group_by(report) %>%
-  filter(date>report) %>%
-  summarise(
-    optimist =  round(sqrt(sum(error_min^2)/length(which(!is.na(error_min))))),
-    median =  round(sqrt(sum(error_med^2)/length(which(!is.na(error_med))))),
-    pessimist =  round(sqrt(sum(error_max^2)/length(which(!is.na(error_max)))))
-  )
-#combine ICU and hospital admissions RMSE
-rmse <- bind_rows(
-  rmse_ICU %>% mutate(variable = "ICU"), 
-  rmse_hosp %>% mutate(variable = "hospital admissions")
-  ) %>% 
-  mutate(report = as.Date(report))
-rm(rmse_ICU, rmse_hosp)
-
-#date of the reports, to position on the graph
-report_dates <- data_frame(
-  report = unique(as.Date(rmse$report)),
-  place = report #to localize on x axis
-)
-#small offset to position summer 2021 reports
-report_dates$place[report_dates$place=="2021-07-26"] <- report_dates$place[report_dates$place=="2021-07-26"]-10
-report_dates$place[report_dates$place=="2021-08-05"] <- report_dates$place[report_dates$place=="2021-08-05"]+3
-#small offset to position winter 2021 reports
-report_dates$place[report_dates$place=="2021-01-16"] <- report_dates$place[report_dates$place=="2021-01-16"]-10
-report_dates$place[report_dates$place=="2021-02-02"] <- report_dates$place[report_dates$place=="2021-02-02"]-5
-report_dates$place[report_dates$place=="2021-02-08"] <- report_dates$place[report_dates$place=="2021-02-08"]+10
-report_dates$place[report_dates$place=="2021-02-23"] <- report_dates$place[report_dates$place=="2021-02-23"]+15
-
-#graph
-ggplot(rmse) +
-  geom_point(
-    aes(report, median)
-    ) +
-  geom_errorbar(
-    aes(x = report, ymin = optimist, ymax = pessimist),
-    width=.2
-    ) +
-  facet_wrap(vars(variable), nrow = 2) +
-  ylim(0, 100) +
-  #dates of reports on x axis
-  scale_x_continuous(
-    breaks=report_dates$place,
-    labels=format(report_dates$report, format="%b %d, %Y")
-    ) +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust=1),
-    axis.ticks.x=element_blank()
-    ) +
-  labs(
-    x="report date", y="RMSE, % of historical peak",
-    subtitle = "point: median scenario       error bar: range of all scenarios"
-  )
-```
-
-### Mean Error
-
-```{r}
-#ME Mean Error for each ICU report (optimist, median and pessimist scenario)
-ME_ICU <- data_ICU_error %>%
-  group_by(report) %>%
-  filter(date>report) %>%
-  summarise(
-    optimist =  round(sum(error_min)/length(which(!is.na(error_min)))),
-    median =  round(sum(error_med)/length(which(!is.na(error_med)))),
-    pessimist =  round(sum(error_max)/length(which(!is.na(error_max))))
-  )
-#ME Mean Error for each hospital admissions report (optimist, median and pessimist scenario)
-ME_hosp <- data_new_hosp_error %>%
-  group_by(report) %>%
-  filter(date>report) %>%
-  summarise(
-    optimist =  round(sum(error_min)/length(which(!is.na(error_min)))),
-    median =  round(sum(error_med)/length(which(!is.na(error_med)))),
-    pessimist =  round(sum(error_max)/length(which(!is.na(error_max))))
-  )
-#combine ICU and hospital admissions ME
-ME <- bind_rows(
-  ME_ICU %>% mutate(variable = "ICU"), 
-  ME_hosp %>% mutate(variable = "hospital admissions")
-  ) %>% 
-  mutate(report = as.Date(report))
-rm(ME_ICU, ME_hosp)
-
-#date of the reports, to position on the graph
-report_dates <- data_frame(
-  report = unique(as.Date(ME$report)),
-  place = report #to localize on x axis
-)
-#small offset to position summer 2021 reports
-report_dates$place[report_dates$place=="2021-07-26"] <- report_dates$place[report_dates$place=="2021-07-26"]-10
-report_dates$place[report_dates$place=="2021-08-05"] <- report_dates$place[report_dates$place=="2021-08-05"]+3
-#small offset to position winter 2021 reports
-report_dates$place[report_dates$place=="2021-01-16"] <- report_dates$place[report_dates$place=="2021-01-16"]-10
-report_dates$place[report_dates$place=="2021-02-02"] <- report_dates$place[report_dates$place=="2021-02-02"]-5
-report_dates$place[report_dates$place=="2021-02-08"] <- report_dates$place[report_dates$place=="2021-02-08"]+10
-report_dates$place[report_dates$place=="2021-02-23"] <- report_dates$place[report_dates$place=="2021-02-23"]+15
-
-#graph
-ggplot(ME) +
-  geom_point(
-    aes(report, median)
-    ) +
-  geom_errorbar(
-    aes(x = report, ymin = optimist, ymax = pessimist),
-    width=.2
-    ) +
-  facet_wrap(vars(variable), nrow = 2) +
-  ylim(-100, 100) + #dates of reports on x axis
-  #dates of reports on x axis
-  scale_x_continuous(
-    breaks=report_dates$place,
-    labels=format(report_dates$report, format="%b %d, %Y")
-    ) +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust=1),
-    axis.ticks.x=element_blank()
-    ) +
-  geom_hline(yintercept = 0, linetype = "dashed", alpha=.5) +
-  labs(
-    x="report date", y="mean error, % of historical peak",
-    subtitle = "point: median scenario       error bar: range of all scenarios"
-  )
-```
-
-
 # Other figures and appendix {.tabset .tabset-fade .tabset-pills}
 
 ## Winter 2021 curfew discussion
@@ -2917,14 +2833,10 @@ ggplot(temp) +
   xlim(as.Date("2021-01-01"), as.Date("2021-04-01"))
 
 #save
-ggsave(#svg
-  "../graphs/curfew_discussion.svg",
-  dpi=500, width=7, height=4, bg="white"
-  )
-ggsave(#png
-  "../graphs/curfew_discussion.png",
-  dpi=500, width=7, height=4, bg="white"
-  )
+f_save_graph_pdf_png(
+  "../graphs/raw_comparisons/curfew_discussion",
+  7, 4, dpi_resolution
+)
 ```
 
 ## Illegitimate comparisons {.tabset .tabset-fade}
@@ -2963,16 +2875,11 @@ ggplot(temp) +
     legend.background = element_rect(fill="transparent")
     )
 
-
 #save
-ggsave(#svg
-  "../graphs/legitimate_Feb_08_2021.svg",
-  dpi=500, width=2.5, height=2.5, bg="white"
-  )
-ggsave(#png
-  "../graphs/legitimate_Feb_08_2021.png",
-  dpi=500, width=2.5, height=2.5, bg="white"
-  )
+f_save_graph_pdf_png(
+  "../graphs/raw_comparisons/legitimate_Feb_08_2021",
+  2.5, 2.5, dpi_resolution
+)
 ```
 
 ### Jan 07, 2022
@@ -3005,14 +2912,10 @@ ggplot(temp) +
     )
 
 #save
-ggsave(#svg
-  "../graphs/legitimate_Jan_07_2022.svg",
-  dpi=500, width=2.5, height=2.5, bg="white"
-  )
-ggsave(#png
-  "../graphs/legitimate_Jan_07_2022.png",
-  dpi=500, width=2.5, height=2.5, bg="white"
-  )
+f_save_graph_pdf_png(
+  "../graphs/raw_comparisons/legitimate_Jan_07_2022",
+  2.5, 2.5, dpi_resolution
+)
 ```
 
 
