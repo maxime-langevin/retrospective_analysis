@@ -159,7 +159,9 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-
+data_preparation/.DS_Store
+data_preparation/output_data/.DS_Store
+graphs/.DS_Store
 data_preparation/_site/source_data/.DS_Store
 .DS_Store
 data_preparation/_site/source_data/reality_Paireau_2022_paper/full_data.rds

@@ -7,25 +7,10 @@ output:
     toc_float: true
 ---
 
-CHANGER AJUSTEMENT ? : NE PAS TOUCHER A REALITY, JUSTE CHANGER REALITY REPORT ET SCENARIOS
-
-ENREGISTRER REALITY, LA COMBINAISON DE TOUS LES SCENARIOS
-
-MIEUX DE PRENDRE LE med = (max+min)/2 que le vrai med, pose problème quand bcp de scénarios multipliés ?
-
-This notebook prepares the data used in our analyses. 
-
-The first paragraph *Prepare reality data* focuses on true data of Intensive Care Units (ICU) and Hospitalizations. Most of it is from one of Pasteur Institutes's team paper ([Paireau et al 2022](https://www.pnas.org/doi/abs/10.1073/pnas.2103302119)), which has its own cleaning and smoothing process of the government raw data. This dataset stops on July 2021. Beyond this date we use data from multiple sources (Pasteur Institue's subsequent reports, government data) and combine them all to produce one unique and coherent dataset.
-
-Since Pasteur Institute's scenarios data were not public, we had to extract them manually from the reports figures, using [WebPlotDigitizer](https://apps.automeris.io/wpd/). The process for each report is described in the *Prepare Scenarios ICU* and *Prepare Scenarios Hospitalizations* paragraphs. For each report we indicate its original URL source. Then :
-
-  -   In the *Original* tab, we provide the screenshot of the original scenarios figures from which data are extracted.
-  -   In the *Reproduced* tab, we reproduce the original figures from our extracted data. In some rare cases, we horizontally or vertically offset the data for better alignment, based on comparison to reality data before report publication.
-  -   EST CE QUE JE LAISSE LE ERROR TAB ??
+This notebook prepares the data used in our analyses. It also produces the figures plotting the raw comparisons between reality and scenarios displayed in our article.
 
 ```{r setup, include=T, message=F, warning=F}
-knitr::opts_chunk$set(message=F, warning=F, fig.align = "center",  dev='svg')
-
+knitr::opts_chunk$set(message=F, warning=F, fig.align = "center",  dev='png')
 
 library(tidyverse) #loads multiple packages (see https://tidyverse.tidyverse.org/)
 
@@ -62,6 +47,7 @@ library(zoo) #for rollmean function
 library(cowplot) #for plot_grid()
 library(ISOweek) #to convert weeks to date and vice versa
 
+#setting graphs theme
 theme_set(
   theme_classic() +
   theme(panel.grid.major.y = element_line(),
@@ -70,9 +56,15 @@ theme_set(
         )
   )
 g_theme <- scale_color_manual(values=c('#ff0000', "black",'#D8D8D8'))
+
+
+# Get the directory of the R Markdown file and set the working directory to the file location
+md_dir <- dirname(rstudioapi::getActiveDocumentContext()$path)
+setwd(md_dir)
 ```
 
 ```{r function_to_generate_min_med_max_error}
+#function to extract med, min and max scenarios, and compute their relative errors to reality in %. Adds them 6 to the original dataset.
 f_compute_error <- function(date_begin, date_end, dataset, normalization_figure){
   #dates delimiting the comparison period
   date_min <- as.Date(date_begin)
@@ -108,6 +100,7 @@ f_compute_error <- function(date_begin, date_end, dataset, normalization_figure)
 ```
 
 ```{r function_graph}
+#function to plot scenarios vs reality
 f_graph <- 
   function(
     true_data, scenarios, variable, 
@@ -171,6 +164,7 @@ f_graph <-
 ```
 
 ```{r function_to_correct_curves}
+#when scenarios and reality are not  perfectly align even before the report publication date, function to add vertical or horizontal offset
 f_offset <- function(dataset_scenarios, dataset_reality, variable_select){
   #reality 
   temp_reality <- dataset_reality %>% select(date, reality = !!as.symbol(variable_select))
@@ -193,6 +187,7 @@ f_offset <- function(dataset_scenarios, dataset_reality, variable_select){
 ```
 
 ```{r function_graph_of_corrected_data}
+#function to plot reality vs scenarios after the offset correction
 f_graph_corrected <- 
   function(
     scenarios, 
@@ -259,6 +254,7 @@ f_graph_corrected <-
 ```
 
 ```{r function_graph_of_errors}
+#function to plot relative errors
 f_graph_error <- function(
     dataset, x_label, y_label
     ){
@@ -280,6 +276,14 @@ f_graph_error <- function(
 ```
 
 # Prepare Data
+
+The first paragraph *Prepare reality data* focuses on true data of Intensive Care Units (ICU) and Hospitalizations. Most of it is from one of Pasteur Institutes's team paper ([Paireau et al 2022](https://www.pnas.org/doi/abs/10.1073/pnas.2103302119)), which has its own cleaning and smoothing process of the government raw data. This dataset stops on July 2021. Beyond this date we use data from multiple sources (Pasteur Institue's subsequent reports, government data) and combine them all to produce one unique and coherent dataset.
+
+Since Pasteur Institute's scenarios data were not public, we had to extract them manually from the reports figures, using [WebPlotDigitizer](https://apps.automeris.io/wpd/). The process for each report is described in the *Prepare Scenarios ICU* and *Prepare Scenarios Hospitalizations* paragraphs. For each report we indicate its original URL source. Then :
+
+  -   In the *Original* tab, we provide the screenshot of the original scenarios figures from which data are extracted.
+  -   In the *Reproduced* tab, we reproduce the original figures from our extracted data. In some rare cases, we horizontally or vertically offset the data for better alignment, based on comparison to reality data before report publication.
+  -   In the *Error* tab, we check the error of best-case, worst-case and median scenarios to reality, expressed as a % of the historical hospitalization peak.
 
 ## Prepare reality data {.tabset .tabset-fade .tabset-pills}
 
@@ -479,7 +483,7 @@ plot_grid(
 
 #### Hospital admissions
 
-We cannot apply the same method for new hospital admissions, since the modellers use a modified indicator not reported in data.gouv (see details in [Paireau et al 2022](https://www.pnas.org/doi/abs/10.1073/pnas.2103302119). So for the period after July 2021, we have to extract the true data of "new hospital admissions" from the different subsequent reports, when it is reported.
+We cannot apply the same method as ICU beads for new hospital admissions, since the modellers use a modified indicator not reported in data.gouv (see details in [Paireau et al 2022](https://www.pnas.org/doi/abs/10.1073/pnas.2103302119)). So for the period after July 2021, we have to extract the true data of "new hospital admissions" from the different subsequent reports, when it is reported.
 
 ```{r combine_data_on_hospitalizations}
 #graph of all sources
@@ -672,8 +676,6 @@ write_csv(error, paste0(output_path_error, "2020_04_28_ICU_error.csv"))
 ### October 30, 2020 {.tabset .tabset-fade .tabset-pills}
 
 Source: [Les Echos newspaper](https://www.lesechos.fr/economie-france/social/covid-la-decrue-dans-les-services-de-reanimation-esperee-en-france-dans-une-dizaine-de-jours-1261656), November 3, 2020. We know the publication date from the statement "The scientists from Pasteur Institute and Santé Publique France updated their epidemic scenarios on October 30". Identified by Google search.
-
-checker la sortie du confinement
 
 #### Orginal
 
@@ -2556,226 +2558,6 @@ f_save_graph_pdf_png(
 )
 ```
 
-
-## All errors grouped {.tabset .tabset-fade .tabset-pills}
-
-```{r}
-path_source <- "output_data/min_med_max_and_error/"
-
-f_read_ICU_error <- function(date_scenario){
-  
-  #get scenario data, add report ID
-  data <- read_csv(
-    paste0(path_source, "ICU_error/", date_scenario, "_ICU_error.csv")
-    ) %>% 
-    mutate(report = gsub("_", "-", date_scenario))
-  
-  data <- data %>% select(report, date, error_min, error_med, error_max) %>%
-    filter(
-      is.na(error_min)==F & is.na(error_med)==F & is.na(error_max)==F
-      ) %>%
-    mutate(
-      days_since_publication = as.Date(date)-as.Date(report)
-      ) 
-  
-  return(data)
-}
-
-f_read_new_hosp_error <- function(date_scenario){
-  #get scenario data, add report ID
-  data <- read_csv(
-    paste0(path_source, "new_hosp_error/", date_scenario, "_new_hosp_error.csv")
-    ) %>% 
-    mutate(report = gsub("_", "-", date_scenario))
-  
-  data <- data %>% select(report, date, error_min, error_med, error_max) %>%
-    filter(
-      is.na(error_min)==F & is.na(error_med)==F & is.na(error_max)==F
-      ) %>%
-    mutate(
-      days_since_publication = as.Date(date)-as.Date(report)
-      ) 
-  
-  return(data)
-}
-
-#ICU data
-data_ICU_error <- bind_rows(
-  f_read_ICU_error("2020_04_28"),
-  f_read_ICU_error("2020_10_30"),
-  f_read_ICU_error("2021_05_21"),
-  f_read_ICU_error("2021_07_26"),
-  f_read_ICU_error("2021_08_05"),
-  f_read_ICU_error("2022_01_07")
-)
-
-#new hosp data
-data_new_hosp_error <- bind_rows(
-  f_read_new_hosp_error("2021_01_16"),
-  f_read_new_hosp_error("2021_02_02"),
-  f_read_new_hosp_error("2021_02_08"),
-  f_read_new_hosp_error("2021_02_23"),
-  f_read_new_hosp_error("2021_04_26"),
-  f_read_new_hosp_error("2021_05_21"),
-  f_read_new_hosp_error("2021_07_26"),
-  f_read_new_hosp_error("2021_08_05"),
-  f_read_new_hosp_error("2021_10_04"),
-  f_read_new_hosp_error("2022_01_07")
-) 
-```
-
-```{r}
-temp <- bind_rows(
-  data_ICU_error %>% mutate(variable = "ICU"),
-  data_new_hosp_error  %>% mutate(variable = "new hosp")
-) %>% 
-  gather(min_med_max, error_perc, error_min, error_med, error_max)
-  
-max_error <- max(temp$error_perc, na.rm = T)
-ggplot(temp) +
-  geom_line(
-    aes(days_since_publication, error_perc, color=abs(error_perc), group=report),
-    linewidth=1
-    ) +
-  geom_vline(xintercept = 0, linetype="dashed") +
-  scale_colour_stepsn(
-    colours = c("green", "orange", "red", "purple"), 
-    values = c(0, 15, 30, 100, max_error)/max_error,
-    breaks = c(0, 15, 30, 100, max_error),
-    labels = c("0%", "± 15%", "± 30%", "± 100%", ""),
-  ) +
-  facet_grid(variable~min_med_max) +
-  ylim(NA, 100) +
-  xlim(-20, NA)
-
-
-ggplot(temp %>% filter(variable=="ICU")) +
-  geom_line(
-    aes(days_since_publication, error_perc, color=abs(error_perc), group=report),
-    linewidth=1
-    ) +
-  scale_colour_stepsn(
-    colours = c("green", "orange", "red", "purple"), 
-    values = c(0, 15, 30, 100, max_error)/max_error,
-    breaks = c(0, 15, 30, 100, max_error),
-    labels = c("0%", "± 15%", "± 30%", "± 100%", "")
-  ) +
-  facet_grid(min_med_max~report) +
-  ylim(-100, 150) + xlim(-20, NA)
-
-
-ggplot(
-  temp %>% 
-    filter(variable=="new hosp")
-  ) +
-  geom_line(
-    aes(days_since_publication, error_perc, color=abs(error_perc), group=report),
-    linewidth=1
-    ) +
-  scale_colour_stepsn(
-    colours = c("green", "orange", "red", "purple"), 
-    values = c(0, 15, 30, 100, max_error)/max_error,
-    breaks = c(0, 15, 30, 100, max_error)
-  ) +
-  facet_grid(min_med_max~report) +
-  ylim(-100, 150) + xlim(-20, NA)
-```
-
-
-## Individual report and error {.tabset .tabset-fade .tabset-pills}
-
-### Individual Comparison {.tabset .tabset-fade}
-
-#### ICU beds
-
-```{r}
-ggplot(data_ICU_beds) +
-  #scenarios
-  geom_line(
-    aes(date, value, group=interaction(scenario_type, report), color="report scenarios"), 
-    linewidth=1.5
-    ) +
-  #reality national scale
-  geom_line(
-    aes(date, reality, linetype=" reality")
-    ) +
-  #dummy baseline
-  geom_line(
-    aes(date, dummy, linetype="constant dummy baseline")
-    ) +
-  ylim(0, NA) +
-  facet_wrap(vars(report), scales="free") +
-  labs(
-    title = "Pasteur Institute scenarios during COVID-19\nIntensive Care Units",
-    y="ICU beds\noccupied by COVID-patients", x="",
-    linetype="",
-    color=""
-  ) 
-```
-
-#### Hospital Admissions
-
-```{r}
-ggplot(data_new_hosp) +
-  #scenarios
-  geom_line(
-    aes(date, value, group=interaction(scenario_type, report), color="report scenarios"), 
-    linewidth=1.5
-    ) +
-  #reality national scale
-  geom_line(
-    aes(date, reality, linetype=" reality")
-    ) +
-  #dummy baseline
-  geom_line(
-    aes(date, dummy, linetype="constant dummy baseline")
-    ) +
-  ylim(0, NA) +
-  facet_wrap(vars(report), scales="free") +
-  labs(
-    title = "Pasteur Institute scenarios during COVID-19\nHospital Admissions",
-    y="daily new hospital admissions\nrelated to COVID", x="",
-    linetype="",
-    color=""
-  ) 
-```
-
-
-
-### Error {.tabset .tabset-fade .tabset-pills}
-
-#### ICU
-
-```{r}
-ggplot(data_ICU_beds) +
-  geom_line(aes(days_since_publication, error, color = "Pasteur's scenarios", group=scenario_type)) +
-  geom_line(aes(days_since_publication, error_dummy, color="dummy variable")) +
-  facet_wrap(vars(report)) +
-  geom_hline(yintercept = 0, linetype="dashed") +
-  ylim(-50, 150) +
-  labs(
-    y="error to reality as % of 1st wave peak",
-    x="number of days since report publication",
-    color=""
-  )
-```
-
-#### Hospital Admissions
-
-```{r}
-ggplot(data_new_hosp) +
-  geom_line(aes(days_since_publication, error, color = "Pasteur's scenarios", group=scenario_type)) +
-  geom_line(aes(days_since_publication, error_dummy, color="dummy variable")) +
-  facet_wrap(vars(report)) +
-  geom_hline(yintercept = 0, linetype="dashed") +
-  ylim(-50, 150) +
-  labs(
-    y="error to reality as % of 1st wave peak",
-    x="number of days since report publication",
-    color=""
-  )
-```
-
 # Other figures and appendix {.tabset .tabset-fade .tabset-pills}
 
 ## Winter 2021 curfew discussion
@@ -2916,6 +2698,11 @@ f_save_graph_pdf_png(
   "../graphs/raw_comparisons/legitimate_Jan_07_2022",
   2.5, 2.5, dpi_resolution
 )
+```
+
+
+```{r remove_all_files_from_environement}
+rm(list = ls())
 ```
 
 
