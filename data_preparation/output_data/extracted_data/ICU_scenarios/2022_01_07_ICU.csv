@@ -1,5 +1,4 @@
 date,red_pessimiste_VE,green_pessimiste_VE,blue_pessimiste_VE,reality_report,reality
-2021-11-30,1930,1930,1930,NA,1861
 2021-12-01,1980,1980,1980,1930,1988
 2021-12-02,2010,2010,2010,1980,1967
 2021-12-03,2120,2120,2120,2010,1996
@@ -121,4 +120,3 @@ date,red_pessimiste_VE,green_pessimiste_VE,blue_pessimiste_VE,reality_report,rea
 2022-03-29,NA,1390,1280,NA,1512
 2022-03-30,NA,1350,1230,NA,1500
 2022-03-31,NA,1300,1160,NA,NA
-2022-04-01,NA,NA,NA,NA,NA
