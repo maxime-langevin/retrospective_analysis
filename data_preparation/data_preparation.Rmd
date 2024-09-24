@@ -54,17 +54,17 @@ g_theme <- scale_color_manual(values=c('#ff0000', "black",'#D8D8D8'))
 #resolution of png graphs
 dpi_resolution <- 350
 
-#import function
+#import functions
 source("functions.R")
 ```
 
 # Prepare Data
 
-The first section **Prepare reality data** focuses on true data of Intensive Care Units (ICU) and Hospitalizations. Most of it is from one of Pasteur Institutes's team paper ([Paireau et al 2022](https://www.pnas.org/doi/abs/10.1073/pnas.2103302119)), which has its own cleaning and smoothing process of the government raw data. This dataset stops on July 2021. Beyond this date we use data from multiple sources (Pasteur Institue's subsequent reports, government data) and combine them all to produce one unique and coherent dataset.
+The first section **Prepare reality data** focuses on true data of Intensive Care Units (ICU) and Hospitalizations. Most of it is from one of Pasteur Institute's modelling unit paper ([Paireau et al 2022](https://www.pnas.org/doi/abs/10.1073/pnas.2103302119){target="_blank"}), which has its own cleaning and smoothing process of the government raw data. This dataset stops on July 2021. Beyond this date we use data from multiple sources (Pasteur Institute's subsequent reports and government data) and combine them all to produce one unique and coherent dataset.
 
-Since Pasteur Institute's scenarios data were not public, we had to extract them manually from the reports figures, using [WebPlotDigitizer](https://apps.automeris.io/wpd/). The process for each report is described in the **Prepare Scenarios ICU** and **Prepare Scenarios Hospitalizations** paragraphs. For each report we indicate its original URL source. Then :
+Since scenarios data were not public, we had to extract them manually from the reports figures, using [WebPlotDigitizer](https://apps.automeris.io/wpd/){target="_blank"}. The process for each report is described in the **Prepare Scenarios ICU** and **Prepare Scenarios Hospitalizations** paragraphs. For each report we indicate its original URL source. Then :
 
-  -   In the *Reproduced* tab, we reproduce the original figures from our extracted data. In some rare cases, we horizontally or vertically offset the data for better alignment, based on comparison to the reports' reality data.
+  -   In the *Reproduced* tab, we reproduce the original figures from our extracted data and compare them to reality.
   -   In the *Error* tab, we check the error of best-case, worst-case and median scenarios to reality, expressed as a % of the historical hospitalization peak.
   -   In the *Original* tab, we provide the screenshot of the original scenarios figures from which data are extracted.
 
@@ -72,7 +72,7 @@ Since Pasteur Institute's scenarios data were not public, we had to extract them
 
 ### Sources
 
-Most of our reality data is based on [Paireau et al (2022)](https://www.pnas.org/doi/abs/10.1073/pnas.2103302119) paper, the official data processed by Pasteur Institute, which gives us the data up to July 2021.
+Most of our reality data is based on [Paireau et al (2022)](https://www.pnas.org/doi/abs/10.1073/pnas.2103302119){target="_blank"} paper, the official data processed by Pasteur Institute, which gives us the data up to July 2021.
 
 ```{r load_Paireau_et_al_data_France}
 # to read data from Paireau et al (2022) at a given geographical scale
@@ -80,7 +80,7 @@ true_data_Paireau_et_al <- f_read_paireau("metropolitan") #national scale
 true_data_Paireau_et_al_IDF <- f_read_paireau("IDF") #Ile-de-France region scale
 ```
 
-Beyond July 2021, for Intensive Care Units (ICU) data, we load the the reported data on data.gouv, on [this page](https://www.data.gouv.fr/fr/datasets/donnees-hospitalieres-relatives-a-lepidemie-de-covid-19/). We then combine it with Paireau et al data.
+Beyond July 2021, for Intensive Care Units (ICU) data, we load the the reported data on data.gouv, on [this page](https://www.data.gouv.fr/fr/datasets/donnees-hospitalieres-relatives-a-lepidemie-de-covid-19/){target="_blank"}. We then combine it with Paireau et al data.
 
 ```{r load_data_gouv_data}
 # download data related to ICU and hospitalization data from the data.gouv source
@@ -112,7 +112,7 @@ data_gouv_ICU_beds <- data_gouv_beds_hosp_rea %>%
     )
 ```
 
-For daily hospital admissions, Paireau et al (2022) use a smoothing process. This processed data is reported only up to July 2021. Beyond this date, we manually extract the data from the subsequent Pasteur reports, using [WebplotDigitizer](https://apps.automeris.io/wpd/).
+For daily hospital admissions, Paireau et al (2022) use a smoothing process. This processed data is reported only up to July 2021. Beyond this date, we manually extract the data from the subsequent Pasteur reports, using [WebplotDigitizer](https://apps.automeris.io/wpd/){target="_blank"}.
 
 ```{r load_Pasteur_reports_hospital_data}
 # load Pasteur reports data on new admissions
@@ -136,9 +136,9 @@ true_data_new_hosp_Pasteur_reports <- bind_rows(
   )
 ```
 
-The reality datasets comparison and combination is detailed in the next tab *datasets combination*
+The reality datasets comparison and combination is detailed in the next tab *Datasets Combination*
 
-### Datasets combinations {.tabset .tabset-fade}
+### Datasets combination {.tabset .tabset-fade}
 
 #### ICU
 
@@ -261,7 +261,7 @@ plot_grid(
 
 #### Hospital admissions
 
-We cannot apply the same method as ICU beds for new hospital admissions, since the modelers use a modified indicator not reported in data.gouv (see details in [Paireau et al 2022](https://www.pnas.org/doi/abs/10.1073/pnas.2103302119)). So for the period after July 2021, we have to extract the true data of "new hospital admissions" from the different subsequent Pasteur reports, when it is reported.
+We cannot apply the same method as ICU beds for new hospital admissions, since the modelers use a modified indicator not reported in data.gouv (see details in [Paireau et al 2022](https://www.pnas.org/doi/abs/10.1073/pnas.2103302119){target="_blank"}). So for the period after July 2021, we have to extract the true data of "new hospital admissions" from the different subsequent Pasteur reports, when it is reported.
 
 ```{r graph_all_pasteur_reports_true_data_new_hosp}
 #graph of all sources
@@ -391,7 +391,7 @@ rm(true_data_Paireau_et_al_IDF)
 ```
 
 
-#### historical maxima beds occupancy
+### Historical maxima beds occupancy
 
 In our analysis, we use the historical maxima of ICU beds occupancy and hospital admissions to normalize the error between scenarios and reality.
 
@@ -410,17 +410,15 @@ max_new_hosp_IDF <- max(reality_new_hosp_adm_IDF$new_hosp_smooth, na.rm=T)
 ## Prepare Scenarios ICU
 
 ```{r output_path_for_corrected_ICU_scenarios}
-#output_path_for_corrected_ICU_scenarios
-
+# where prepared ICU data is saved
 output_path <- "output_data/extracted_data/ICU_scenarios/"
 output_path_error <- "output_data/min_med_max_and_error/ICU_error/"
 ```
 
 
-
 ### October 30, 2020 {.tabset .tabset-fade .tabset-pills}
 
-Source: [Les Echos newspaper](https://www.lesechos.fr/economie-france/social/covid-la-decrue-dans-les-services-de-reanimation-esperee-en-france-dans-une-dizaine-de-jours-1261656), November 3, 2020. We know the publication date from the statement "The scientists from Pasteur Institute and Santé Publique France updated their epidemic scenarios on October 30". Identified by Google search.
+Source: [Les Echos newspaper](https://www.lesechos.fr/economie-france/social/covid-la-decrue-dans-les-services-de-reanimation-esperee-en-france-dans-une-dizaine-de-jours-1261656){target="_blank"}, November 3, 2020. We know the publication date from the statement "The scientists from Pasteur Institute and Santé Publique France updated their epidemic scenarios on October 30". Identified by Google search.
 
 #### Reproduced
 
@@ -431,29 +429,24 @@ scenarios <- read_csv("source_data/2020_10_30/ICU.csv") %>%
 
 # graph comparison
 f_graph(
-  reality_ICU_beds, scenarios, 
-  "ICU_beds", 
+  reality_ICU_beds, scenarios, # reality and scenarios datasets
+  "ICU_beds", # variable of interest
   "2020-10-30", 5000, #publication date label
-  "2020-10-01", "2020-12-15", #date limits
-  NA, # y limits
-  "ICU beds",
-  "reality in Paireau et al."
+  "2020-10-01", "2020-12-15", #date limits x axis
+  NA, # y axis limits
+  "ICU beds", # y label
+  "reality in Paireau et al." # reality data source
 )
 
-#We do not correct the data : offset 0
-x_reality_offset <- 0
-y_reality_offset <- 0
-x_scenarios_offset <- 0
-y_scenarios_offset <- 0
-
 # save data
-temp <- f_offset_and_prepare_to_save(scenarios, reality_ICU_beds, "ICU_beds")
-write_csv(temp, paste0(output_path, "2020_10_30_ICU.csv"))
+temp <- f_prepare_to_save(scenarios, reality_ICU_beds, "ICU_beds")
+f_save_csv_files(temp, output_path, "2020_10_30_ICU.csv")
 ```
 
 #### Error
 
 ```{r}
+# compute error and min med max scenarios
 error <- f_compute_error("2020-10-01", "2020-12-15", temp, max_ICU_beds)
 
 f_graph_error(
@@ -461,7 +454,7 @@ f_graph_error(
   "2020-10-30", 25 #publication date label
   )
 
-write_csv(error, paste0(output_path_error, "2020_10_30_ICU_error.csv"))
+f_save_csv_files(error, output_path_error, "2020_10_30_ICU_error.csv") #2nd lockdown ends on Dec 15, so OK to compare up to the end of the scenarios (Dec 15)
 ```
 
 #### Orginal
@@ -473,7 +466,7 @@ knitr::include_graphics("source_data/2020_10_30/2020_10_30.png")
 
 ### May 21, 2021 {.tabset .tabset-fade .tabset-pills}
 
-Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/loosening/Mise_a_jour_scenarios_de_levee_des_mesures_de_freinage_20210521.pdf), May 21, 2021. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/delta-variant-dynamic/).
+Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/loosening/Mise_a_jour_scenarios_de_levee_des_mesures_de_freinage_20210521.pdf){target="_blank"}, May 21, 2021. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/delta-variant-dynamic/){target="_blank"}.
 
 #### Reproduced 
 
@@ -484,37 +477,27 @@ scenarios <- read_csv("source_data/2021_05_21/ICU.csv") %>%
 
 # graph comparison
 f_graph(
-  reality_ICU_beds, scenarios, 
-  "ICU_beds",
-  "2021-05-21", 1000, #publication date label
-  "2021-01-15", "2021-06-30", #date limits
-  NA, # y limits
-  "ICU beds", 
-  "reality in Paireau et al."
-) + 
-  ylim(0, 6100) 
-
-# We do not correct the data: no offset
-x_reality_offset <- 0
-y_reality_offset <- 0
-x_scenarios_offset <- 0
-y_scenarios_offset <- 0
+  reality_ICU_beds, scenarios, # reality and scenarios datasets
+  "ICU_beds", # variable of interest
+  "2021-05-21", 1000, # publication date label
+  "2021-01-15", "2021-06-30", # date limits x axis
+  6100, # y axis limits
+  "ICU beds", # y label
+  "reality in Paireau et al." # reality data source
+) 
 
 # prepare and save data
-temp <- f_offset_and_prepare_to_save(
-  scenarios, 
-  reality_ICU_beds %>% select(date, ICU_beds), 
-  "ICU_beds"
-  )
-write_csv(
+temp <- f_prepare_to_save(scenarios, reality_ICU_beds, "ICU_beds")
+f_save_csv_files(
   temp %>% filter(date<=as.Date("2021-06-15")), #stop comparison mid-June before delta variant dominant
-  paste0(output_path, "2021_05_21_ICU.csv")
+  output_path, "2021_05_21_ICU.csv"
   )
 ```
 
 #### Error
 
 ```{r}
+# compute error and min med max scenarios
 error <- f_compute_error("2021-03-15", "2021-06-15", temp, max_ICU_beds)
 
 f_graph_error(
@@ -522,7 +505,7 @@ f_graph_error(
   "2021-05-21", 10 #publication date label
   )
 
-write_csv(error, paste0(output_path_error, "2021_05_21_ICU_error.csv"))
+f_save_csv_files(error, output_path_error, "2021_05_21_ICU_error.csv")
 ```
 
 #### Original {.tabset .tabset-fade}
@@ -555,7 +538,7 @@ knitr::include_graphics("source_data/2021_05_21/2021_05_21_fig3G.png")
 
 ### July 26, 2021 {.tabset .tabset-fade .tabset-pills}
 
-Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/variant/Institut_Pasteur_Acceleration_vaccination_et_Delta_20210726.pdf), July 26, 2021. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/delta-variant-dynamic/).
+Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/variant/Institut_Pasteur_Acceleration_vaccination_et_Delta_20210726.pdf){target="_blank"}, July 26, 2021. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/delta-variant-dynamic/){target="_blank"}.
 
 #### Reproduced 
 
@@ -564,29 +547,24 @@ scenarios <- read_csv("source_data/2021_07_26/ICU.csv") %>%
   mutate(date = as.Date(date, format = "%Y/%m/%d", optional = T))
 
 f_graph(
-  reality_ICU_beds, scenarios, 
-  "ICU_beds",
+  reality_ICU_beds, scenarios, # reality and scenarios datasets
+  "ICU_beds", # variable of interest
   "2021-07-26", 5000, #publication date label
-  "2021-06-15", "2021-10-01", #date limits
-  NA, # y limits
-  "ICU beds", 
-  "reality in data.gouv"
+  "2021-06-15", "2021-10-01", #date limits on x axis
+  NA, # y axis limits
+  "ICU beds", # y label
+  "reality in data.gouv" # reality label
 ) 
 
-# We do not correct the data (no x nor y offset for better alignment). 
-x_reality_offset <- 0
-y_reality_offset <- 0
-x_scenarios_offset <- 0
-y_scenarios_offset <- 0
-
 # save data
-temp <- f_offset_and_prepare_to_save( scenarios,  reality_ICU_beds,  "ICU_beds")
-write_csv(temp, paste0(output_path, "2021_07_26_ICU.csv"))
+temp <- f_prepare_to_save( scenarios,  reality_ICU_beds,  "ICU_beds")
+f_save_csv_files(temp, output_path, "2021_07_26_ICU.csv")
 ```
 
 #### Error
 
 ```{r}
+# compute error and min med max scenarios
 error <- f_compute_error("2021-07-15", "2021-10-10", temp, max_ICU_beds)
 
 f_graph_error(
@@ -594,7 +572,7 @@ f_graph_error(
   "2021-07-26", 100 #publication date label
   )
 
-write_csv(error, paste0(output_path_error, "2021_07_26_ICU_error.csv"))
+f_save_csv_files(error, output_path_error, "2021_07_26_ICU_error.csv")
 ```
 
 #### Original {.tabset .tabset-fade}
@@ -631,7 +609,7 @@ knitr::include_graphics("source_data/2021_07_26/2021_07_26_fig5.png")
 
 ### August 5, 2021 {.tabset .tabset-fade .tabset-pills}
 
-Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/variant/InstitutPasteur_Dynamiques_regionales_des_hospitalisations_20210805.pdf), August 5, 2021. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/delta-variant-dynamic/).
+Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/variant/InstitutPasteur_Dynamiques_regionales_des_hospitalisations_20210805.pdf){target="_blank"}, August 5, 2021. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/delta-variant-dynamic/){target="_blank"}.
 
 #### Reproduced
 
@@ -642,30 +620,25 @@ scenarios <- read_csv("source_data/2021_08_05/ICU.csv") %>%
 
 # graph comparison
 f_graph(
-  reality_ICU_beds, scenarios, 
-  "ICU_beds",
+  reality_ICU_beds, scenarios, # reality and scenarios datasets
+  "ICU_beds",  # variable of interest
   "2021-08-05", 5000, #publication date label
   "2021-06-15", "2021-10-01", #date limits
-  NA, # y limits
-  "ICU beds", 
-  "reality in data.gouv"
+  NA, # y axis limits
+  "ICU beds", # y label
+  "reality in data.gouv" # reality label
 ) 
 
-# We do not correct the data: no offset
-x_reality_offset <- 0
-y_reality_offset <- 0
-x_scenarios_offset <- 0 
-y_scenarios_offset <- 0
-
 # save data
-temp <- f_offset_and_prepare_to_save( scenarios,  reality_ICU_beds,  "ICU_beds")
-write_csv(temp, paste0(output_path, "2021_08_05_ICU.csv"))
+temp <- f_prepare_to_save( scenarios,  reality_ICU_beds,  "ICU_beds")
+f_save_csv_files(temp, output_path, "2021_08_05_ICU.csv")
 ```
 
 
 #### Error
 
 ```{r}
+# compute error and min med max scenarios
 error <- f_compute_error("2021-07-15", "2021-10-10", temp, max_ICU_beds)
 
 f_graph_error(
@@ -673,7 +646,7 @@ f_graph_error(
   "2021-08-05", 50 #publication date label
   )
 
-write_csv(error, paste0(output_path_error, "2021_08_05_ICU_error.csv"))
+f_save_csv_files(error, output_path_error, "2021_08_05_ICU_error.csv")
 ```
 
 #### Original {.tabset .tabset-fade}
@@ -688,7 +661,7 @@ knitr::include_graphics("source_data/2021_08_05/2021_08_05.png")
 
 ### January 7, 2022 {.tabset .tabset-fade .tabset-pills}
 
-Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/variant/InstitutPasteur_Complement_Analyse_Impact_Omicron_20220107_corrige.pdf), January 7, 2022. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/omicron-variant-epidemic/).
+Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/variant/InstitutPasteur_Complement_Analyse_Impact_Omicron_20220107_corrige.pdf){target="_blank"}, January 7, 2022. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/omicron-variant-epidemic/){target="_blank"}.
 
 #### Reproduced 
 
@@ -699,29 +672,24 @@ scenarios <- read_csv("source_data/2022_01_07/ICU_low_VE.csv") %>%
 
 # graph comparison
 f_graph(
-  reality_ICU_beds, scenarios, 
-  "ICU_beds",
+  reality_ICU_beds, scenarios, # reality and scenarios datasets
+  "ICU_beds",  # variable of interest
   "2022-01-07", 1000, #publication date label
   "2021-12-01", "2022-04-01", #date limits
   NA, # y limits
-  "ICU beds", 
-  "reality in data.gouv"
+  "ICU beds", # y label
+  "reality in data.gouv" # reality label
 )
 
-# we do not correct the data: no offset
-x_reality_offset <- 0
-y_reality_offset <- 0
-x_scenarios_offset <- 0
-y_scenarios_offset <- 0
-
 # save data
-temp <- f_offset_and_prepare_to_save(scenarios, reality_ICU_beds, "ICU_beds")
-write_csv(temp, paste0(output_path, "2022_01_07_ICU.csv"))
+temp <- f_prepare_to_save(scenarios, reality_ICU_beds, "ICU_beds")
+f_save_csv_files(temp, output_path, "2022_01_07_ICU.csv")
 ```
 
 #### Error
 
 ```{r}
+# compute error and min med max scenarios
 error <- f_compute_error("2021-12-01", "2022-04-01", temp, max_ICU_beds)
 
 f_graph_error(
@@ -729,7 +697,7 @@ f_graph_error(
   "2022-01-07", 50 #publication date label
   )
 
-write_csv(error, paste0(output_path_error, "2022_01_07_ICU_error.csv"))
+f_save_csv_files(error, output_path_error, "2022_01_07_ICU_error.csv")
 ```
 
 #### Original {.tabset .tabset-fade}
@@ -752,25 +720,14 @@ knitr::include_graphics("source_data/2022_01_07/2022_01_07_SC.png")
 ## Prepare Scenarios Hospitalizations
 
 ```{r output_path_for_corrected_hospital_scenarios}
+# where prepared new hosp data is saved
 output_path <- "output_data/extracted_data/new_hosp_scenarios/"
 output_path_error <- "output_data/min_med_max_and_error/new_hosp_error/"
 ```
 
-
-### January 16, 2021 {.tabset .tabset-fade .tabset-pills}
-
-Source: [EPIcx/Pasteur report](https://www.epicx-lab.com/uploads/9/6/9/4/9694133/inserm_covid-19-voc_dominance-20210116.pdf), January 16, 2021. Cited in the [January 29, 2021 report](https://sante.gouv.fr/IMG/pdf/note_eclairage_variants_modelisation_29_janvier_2021.pdf), which was identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/impact-variant/).
-
-#### Reproduced
-
-```{r 2021_01_16}
-scenarios <- read_csv("source_data/2021_01_16/new_hosp_weekly.csv")
-
-#transform weeks numbers into dates
-scenarios$date <- paste0(scenarios$date, "-4")
-scenarios$date <- ISOweek2date(scenarios$date)
-
-#transform daily data to weekly data
+```{r reality_new_hosp_daily_to_weekly}
+#some scenarios report data on weekly and not daily basis
+#for reality dataset, transform daily data to weekly data, to compare to scenarios
 temp2 <- reality_new_hosp_adm %>%
   select(date,new_hosp) %>%
   mutate(
@@ -779,29 +736,34 @@ temp2 <- reality_new_hosp_adm %>%
     ) %>%
   group_by(date) %>%
   summarise(new_hosp = sum(new_hosp, na.rm=T)) 
+```
+
+
+### January 16, 2021 {.tabset .tabset-fade .tabset-pills}
+
+Source: [EPIcx report 26](https://www.epicx-lab.com/uploads/9/6/9/4/9694133/inserm_covid-19-voc_dominance-20210116.pdf){target="_blank"}, January 16, 2021. Identified on EPIcx lab [webpage](https://www.epicx-lab.com/covid-19-pandemic-response.html){target="_blank"}.
+
+#### Reproduced
+
+```{r 2021_01_16}
+#careful, original data reported per week, have to transform it
+scenarios <- read_csv("source_data/2021_01_16/new_hosp_weekly.csv")
+scenarios$date <- paste0(scenarios$date, "-4") #add number 4 to date, fo "Wednesday"
+scenarios$date <- ISOweek2date(scenarios$date) #transform weeks numbers into dates
 
 #graph comparison
 f_graph(
-  temp2, scenarios, 
-  "new_hosp", 
+  temp2, scenarios, # reality and scenarios datasets
+  "new_hosp", # variable of interest
   "2021-01-16", 1000, #publication date label
-  "2020-10-01", "2021-05-01", #date limits
-  NA, # y limits
-  "weekly hospital admissions",
-  "reality in Paireau et al."
+  "2020-10-01", "2021-05-01", #date limits on x axis
+  NA, # y axis limits
+  "weekly hospital admissions", # y label
+  "reality in Paireau et al." # reality label
 )
 
-#confinement de 16 départements le 20 mars cf https://fr.wikipedia.org/wiki/Chronologie_de_la_pand%C3%A9mie_de_Covid-19_en_France
-#2 semaines pour voir les effets sur hospitalisations. correspond aussi au confinement général du 3 avril
-
-# we do not correct the data: offset 0
-x_reality_offset <- 0
-y_reality_offset <- 0
-x_scenarios_offset <- 0
-y_scenarios_offset <- 0
-
 #prepare and save data
-temp <- f_offset_and_prepare_to_save(scenarios, temp2, "new_hosp")
+temp <- f_prepare_to_save(scenarios, temp2, "new_hosp")
 temp <- temp %>% 
   mutate(across(-c(date), function(x) x/7)) %>% #weekly hosp transformed in daily hosp
   filter(date <= as.Date("2021-03-22")) #stop comparison before 3rd lockdown, on March 22nd
@@ -817,12 +779,13 @@ temp <- left_join(
   mutate(across(-date, ~na.approx(.x, na.rm=F)))
 
 #save
-write_csv(temp, paste0(output_path, "2021_01_16_new_hosp.csv"))
+f_save_csv_files(temp, output_path, "2021_01_16_new_hosp.csv")
 ```
 
 #### Error
 
 ```{r}
+#compute error and min med max scenarios
 error <- f_compute_error("2020-10-01", "2021-05-01", temp, max_new_hosp)
 
 f_graph_error(
@@ -830,7 +793,7 @@ f_graph_error(
   "2021-01-16", 50 #publication date label
   )
 
-write_csv(error, paste0(output_path_error, "2021_01_16_new_hosp_error.csv"))
+f_save_csv_files(error, output_path_error, "2021_01_16_new_hosp_error.csv")
 ```
 
 #### Original {.tabset .tabset-fade}
@@ -844,49 +807,29 @@ knitr::include_graphics("source_data/2021_01_16/2021_01_16.png")
 
 ### February 2, 2021 {.tabset .tabset-fade .tabset-pills}
 
-Source: [EPIcx/Pasteur report](https://www.epicx-lab.com/uploads/9/6/9/4/9694133/inserm-covid-19-voc-lockdown-20210202.pdf), February 2, 2021. Identified on Pasteur Institute's website, on [this page]().
+Source: [EPIcx report 28](https://www.epicx-lab.com/uploads/9/6/9/4/9694133/inserm-covid-19-voc-lockdown-20210202.pdf){target="_blank"}, February 2, 2021. Identified on EPIcx lab [webpage](https://www.epicx-lab.com/covid-19-pandemic-response.html){target="_blank"}.
 
 #### Reproduced 
 
 ```{r 2021_02_02_EPIcx}
-#load scenario
+#careful, original data reported per week, have to transform it
 scenarios <- read_csv("source_data/2021_02_02/new_hosp_weekly.csv")
+scenarios$date <- paste0(scenarios$date, "-4") #add number 4 to date, fo "Wednesday"
+scenarios$date <- ISOweek2date(scenarios$date) #transform weeks numbers into dates
 
-#transform week number into days
-scenarios$date <- paste0(scenarios$date, "-4")
-scenarios$date <- ISOweek2date(scenarios$date)
-
-#transform daily data to weekly data
-temp2 <- reality_new_hosp_adm %>%
-  select(date,new_hosp) %>%
-  mutate(
-    date = ISOweek(date),
-    date = ISOweek2date(paste0(date, "-4"))
-    ) %>%
-  group_by(date) %>%
-  summarise(new_hosp = sum(new_hosp, na.rm=T)) 
-
+#graph comparison
 f_graph(
-  temp2, scenarios, 
-  "new_hosp", 
-  "2021-02-02", 1000, #publication date label
-  "2020-10-01", "2021-05-01", #date limits
-  NA, # y limits
-  "weekly hospital admissions",
-  "reality in Paireau et al."
+  temp2, scenarios, # reality and scenarios datasets
+  "new_hosp", # variable of interest
+  "2021-02-02", 1000, # publication date label
+  "2020-10-01", "2021-05-01", # date limits x axis
+  NA, # y axis limits
+  "weekly hospital admissions", # y label
+  "reality in Paireau et al." # reality label
 )
- 
-#confinement de 16 départements le 20 mars cf https://fr.wikipedia.org/wiki/Chronologie_de_la_pand%C3%A9mie_de_Covid-19_en_France
-#2 semaines pour voir les effets sur hospitalisations. correspond aussi au confinement général du 3 avril
-
-#we do not correct the data: 0 offset
-x_reality_offset <- 0
-y_reality_offset <- 0
-x_scenarios_offset <- 0
-y_scenarios_offset <- 0
 
 #prepare to save data
-temp <- f_offset_and_prepare_to_save(scenarios, temp2, "new_hosp")
+temp <- f_prepare_to_save(scenarios, temp2, "new_hosp")
 
 #date limits of comparison
 temp <- temp %>% mutate(across(-c(date), function(x) x/7)) %>% #weekly hosp transformed in daily hosp
@@ -903,7 +846,7 @@ temp <- left_join(
   mutate(across(-date, ~na.approx(.x, na.rm=F)))
 
 #save
-write_csv(temp, paste0(output_path, "2021_02_02_new_hosp.csv"))
+f_save_csv_files(temp, output_path, "2021_02_02_new_hosp.csv")
 ```
 
 
@@ -917,7 +860,7 @@ f_graph_error(
   "2021-02-02", 50 #publication date label
   )
 
-write_csv(error, paste0(output_path_error, "2021_02_02_new_hosp_error.csv"))
+f_save_csv_files(error, output_path_error, "2021_02_02_new_hosp_error.csv")
 ```
 
 #### Original {.tabset .tabset-fade}
@@ -934,22 +877,9 @@ knitr::include_graphics("source_data/2021_02_02/2021_02_02.png")
 
 ### February 8, 2021 {.tabset .tabset-fade .tabset-pills}
 
-Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/variant/RapportInstitutPasteur_variants_8fevrier2021.pdf), February 8, 2021. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/impact-variant/).
+Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/variant/RapportInstitutPasteur_variants_8fevrier2021.pdf){target="_blank"}, February 8, 2021. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/impact-variant/){target="_blank"}.
 
 #### Reproduced {.tabset .tabset-fade}
-
-We apply small -100 offset for the scenarios on the y axis for better alignment. The apparent discrepancy between the scenarios and the smoothed reality is not due to improper data extraction but is present in the modellers' report. Their scenarios matches the upper bound of the unsmoothed hospital admissions (see *Original* tab), as in our graph.
-
-```{r}
-#offset values
-x_reality_offset <- 0
-y_reality_offset <- 0
-x_scenarios_offset <- 0
-y_scenarios_offset <- -100
-```
-
-
-##### Before correction
 
 ```{r 2021_02_08_Pasteur}
 #load data
@@ -958,47 +888,27 @@ scenarios <- read_csv("source_data/2021_02_08/new_hosp.csv") %>%
 
 #graph comparison
 f_graph(
-  reality_new_hosp_adm, scenarios, 
-  "new_hosp_smooth", 
-  "2021-02-08", 5000, #publication date label
-  "2021-01-01", "2021-06-01", #date limits
-  NA, # y limits
-  "daily hospital admissions",
-  "reality in Paireau et al."
+  reality_new_hosp_adm, scenarios, # datasets reality and scenarios
+  "new_hosp_smooth", # variable of interest
+  "2021-02-08", 5000, # publication date label
+  "2021-01-01", "2021-06-01", # date limits
+  NA, # y axis limits
+  "daily hospital admissions", # y label
+  "reality in Paireau et al." # reality label
 ) +
-  geom_line(
+  geom_line( # add unsmoothed new hosp
     data=reality_new_hosp_adm, aes(date, new_hosp), alpha=.4, color="red"
   )
-```
 
-##### After correction
-
-```{r }
 #prepare corrected data to save
-temp <- f_offset_and_prepare_to_save(
-  scenarios, 
+temp <- f_prepare_to_save(
+  scenarios %>% filter(date <= as.Date("2021-03-22")), #stop comparison before 3rd lockdown, on March 22nd
   reality_new_hosp_adm %>% select(date, new_hosp_smooth),
   "new_hosp_smooth"
   )
 
-#graph comparison corrected
-f_graph_corrected(
-  temp, 
-  "2021-02-08", 5000, #publication date label
-  "2021-01-01", "2021-06-01", #date limits
-  NA, # y limits
-  "daily hospital admissions",
-  "reality in Paireau et al."
-)  +
-  geom_line(
-    data=reality_new_hosp_adm, aes(date, new_hosp+y_reality_offset), alpha=.4, color="red"
-  )
-
-#stop comparison before 3rd lockdown, on March 22nd
-temp <- temp %>% filter(date <= as.Date("2021-03-22")) 
-
 #save
-write_csv(temp, paste0(output_path, "2021_02_08_new_hosp.csv"))
+f_save_csv_files(temp, output_path, "2021_02_08_new_hosp.csv")
 ```
 
 
@@ -1012,7 +922,7 @@ f_graph_error(
   "2021-02-08", 50 #publication date label
   )
 
-write_csv(error, paste0(output_path_error, "2021_02_08_new_hosp_error.csv"))
+f_save_csv_files(error, output_path_error, "2021_02_08_new_hosp_error.csv")
 ```
 
 #### Original {.tabset .tabset-fade}
@@ -1039,49 +949,29 @@ knitr::include_graphics("source_data/2021_02_08/2021_02_08_fig7.png")
 
 ### February 14, 2021 {.tabset .tabset-fade .tabset-pills}
 
-Source: [EPIcx/Pasteur report](https://www.epicx-lab.com/uploads/9/6/9/4/9694133/inserm-covid-19-voc-lockdown-20210202.pdf), February 2, 2021. Identified on Pasteur Institute's website, on [this page]().
+Source: [EPIcx report 29](https://www.epicx-lab.com/uploads/9/6/9/4/9694133/inserm_covid-19-voc_socialdistancing-20210214.pdf){target="_blank"}, February 14, 2021. Identified on EPIcx lab [webpage](https://www.epicx-lab.com/covid-19-pandemic-response.html){target="_blank"}.
 
 #### Reproduced 
 
 ```{r 2021_02_14_EPIcx}
-#load scenario
+#careful, original data reported per week, have to transform it
 scenarios <- read_csv("source_data/2021_02_14/new_hosp_weekly.csv")
+scenarios$date <- paste0(scenarios$date, "-4") #add number 4 to date, fo "Wednesday"
+scenarios$date <- ISOweek2date(scenarios$date) #transform weeks numbers into dates
 
-#transform week number into days
-scenarios$date <- paste0(scenarios$date, "-4") 
-scenarios$date <- ISOweek2date(scenarios$date)
-
-#transform daily data to weekly data for reality data
-temp2 <- reality_new_hosp_adm %>%
-  select(date,new_hosp) %>%
-  mutate(
-    date = ISOweek(date),
-    date = ISOweek2date(paste0(date, "-4"))
-    ) %>%
-  group_by(date) %>%
-  summarise(new_hosp = sum(new_hosp, na.rm=T)) 
-
+#graph comparison
 f_graph(
-  temp2, scenarios, 
-  "new_hosp", 
+  temp2, scenarios, # reality and scenarios datasets
+  "new_hosp", # variable of interest
   "2021-02-14", 1000, #publication date label
   "2020-10-01", "2021-05-01", #date limits
   NA, # y limits
-  "weekly hospital admissions",
-  "reality in Paireau et al."
+  "weekly hospital admissions", # y label
+  "reality in Paireau et al." # reality label
 )
- 
-#confinement de 16 départements le 20 mars cf https://fr.wikipedia.org/wiki/Chronologie_de_la_pand%C3%A9mie_de_Covid-19_en_France
-#2 semaines pour voir les effets sur hospitalisations. correspond aussi au confinement général du 3 avril
-
-#we do not correct the data: 0 offset
-x_reality_offset <- 0
-y_reality_offset <- 0
-x_scenarios_offset <- 0
-y_scenarios_offset <- 0
 
 #prepare to save data
-temp <- f_offset_and_prepare_to_save(scenarios, temp2, "new_hosp")
+temp <- f_prepare_to_save(scenarios, temp2, "new_hosp")
 
 #date limits of comparison
 temp <- temp %>% mutate(across(-c(date), function(x) x/7)) %>% #weekly hosp transformed in daily hosp
@@ -1098,7 +988,7 @@ temp <- left_join(
   mutate(across(-date, ~na.approx(.x, na.rm=F)))
 
 #save
-write_csv(temp, paste0(output_path, "2021_02_14_new_hosp.csv"))
+f_save_csv_files(temp, output_path, "2021_02_14_new_hosp.csv")
 ```
 
 
@@ -1112,7 +1002,7 @@ f_graph_error(
   "2021-02-02", 50 #publication date label
   )
 
-write_csv(error, paste0(output_path_error, "2021_02_02_new_hosp_error.csv"))
+f_save_csv_files(error, output_path_error, "2021_02_14_new_hosp_error.csv")
 ```
 
 #### Original {.tabset .tabset-fade}
@@ -1132,15 +1022,12 @@ knitr::include_graphics("source_data/2021_02_14/2021_02_14.png")
 
 ### February 23, 2021 {.tabset .tabset-fade .tabset-pills}
 
-Source: [Pasteur report](https://hal-pasteur.archives-ouvertes.fr/pasteur-03149525/document), February 23, 2021. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/impact-variant/).
+Source: [Pasteur report](https://hal-pasteur.archives-ouvertes.fr/pasteur-03149525/document){target="_blank"}, February 23, 2021. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/impact-variant/){target="_blank"}.
 
 #### Reproduced 
 
-Scenarios curves diverge from reality before publication date, but this matches the modellers' original report (see *Orginal* tab). In their figure, reality data stops around mid-February, and scenarios curves keep decreasing until at least the first week of March.
-
 ```{r 2021_02_23_Pasteur}
-#February 23 2021
-#besoin de réaligner leurs données sur la réalité (ne compte surement pas exactement la meme chose)
+#load scenario data
 scenarios <- read_csv("source_data/2021_02_23/new_hosp.csv") %>%
   mutate(date = as.Date(date, format = "%Y/%m/%d", optional = T))
 
@@ -1154,23 +1041,14 @@ f_graph(
   "reality in Paireau et al."
 ) 
 
-#confinement de 16 départements le 20 mars cf https://fr.wikipedia.org/wiki/Chronologie_de_la_pand%C3%A9mie_de_Covid-19_en_France
-#2 semaines pour voir les effets sur hospitalisations. correspond aussi au confinement général du 3 avril
-
-#we do not correct the data: 0 offset
-x_reality_offset <- 0
-y_reality_offset <- 0
-x_scenarios_offset <- 0
-y_scenarios_offset <- 0
-
 #prepare and save data
-temp <- f_offset_and_prepare_to_save(
+temp <- f_prepare_to_save(
   scenarios, 
   reality_new_hosp_adm %>% select(date, new_hosp_smooth), 
   "new_hosp_smooth"
   )
 temp <- temp %>% filter(date <= as.Date("2021-03-22")) #stop comparison before 3rd lockdown, on March 22nd
-write_csv(temp, paste0(output_path, "2021_02_23_new_hosp.csv"))
+f_save_csv_files(temp, output_path, "2021_02_23_new_hosp.csv")
 ```
 
 #### Error
@@ -1183,7 +1061,7 @@ f_graph_error(
   "2021-02-23", 15 #publication date label
   )
 
-write_csv(error, paste0(output_path_error, "2021_02_23_new_hosp_error.csv"))
+f_save_csv_files(error, output_path_error, "2021_02_23_new_hosp_error.csv")
 ```
 
 #### Original {.tabset .tabset-fade}
@@ -1204,7 +1082,7 @@ knitr::include_graphics("source_data/2021_02_23/2021_02_23_fig5.png")
 
 ### April 26, 2021 {.tabset .tabset-fade .tabset-pills}
 
-Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/loosening/Scenarios_de_levee_des_mesures_de_freinage_20210426.pdf), April 26, 2021. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/delta-variant-dynamic/).
+Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/loosening/Scenarios_de_levee_des_mesures_de_freinage_20210426.pdf){target="_blank"}, April 26, 2021. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/delta-variant-dynamic/){target="_blank"}.
 
 #### Reproduced 
 
@@ -1228,14 +1106,8 @@ f_graph(
   )  +
   ylim(0, 2000)
 
-#we do not correct data: 0 offset
-x_reality_offset <- 0
-y_reality_offset <- 0
-x_scenarios_offset <- 0
-y_scenarios_offset <- 0
-
 #prepare data so save
-temp <- f_offset_and_prepare_to_save(
+temp <- f_prepare_to_save(
   scenarios, 
   reality_new_hosp_adm %>% select(date, new_hosp_smooth), 
   "new_hosp_smooth"
@@ -1245,7 +1117,7 @@ temp <- f_offset_and_prepare_to_save(
 temp <- temp %>% filter(date<=as.Date("2021-06-15")) #stop comparison mid-June before delta variant dominant
 
 #save data
-write_csv(temp,paste0(output_path, "2021_04_26_new_hosp.csv"))
+f_save_csv_files(temp, output_path, "2021_04_26_new_hosp.csv")
 ```
 
 #### Error
@@ -1256,7 +1128,7 @@ error <- f_compute_error("2021-03-15", "2021-06-15", temp, max_new_hosp)
 f_graph_error(error,
  "2021-04-26", 30 #publication date label
   )
-write_csv(error, paste0(output_path_error, "2021_04_26_new_hosp_error.csv"))
+f_save_csv_files(error, output_path_error, "2021_04_26_new_hosp_error.csv")
 ```
 
 #### Original {.tabset .tabset-fade}
@@ -1271,7 +1143,7 @@ knitr::include_graphics("source_data/2021_04_26/2021_04_26.png")
 
 ### May 21, 2021 {.tabset .tabset-fade .tabset-pills}
 
-Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/loosening/Mise_a_jour_scenarios_de_levee_des_mesures_de_freinage_20210521.pdf), May 21, 2021. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/delta-variant-dynamic/).
+Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/loosening/Mise_a_jour_scenarios_de_levee_des_mesures_de_freinage_20210521.pdf){target="_blank"}, May 21, 2021. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/delta-variant-dynamic/){target="_blank"}.
 
 #### Reproduced 
 
@@ -1290,14 +1162,8 @@ f_graph(
 ) +
   geom_line(data = reality_new_hosp_adm, aes(date, new_hosp), alpha=.4, color="red")
 
-#we do not correct data: 0 offset
-x_reality_offset <- 0
-y_reality_offset <- 0
-x_scenarios_offset <- 0
-y_scenarios_offset <- 0
-
 #prepare data
-temp <- f_offset_and_prepare_to_save(
+temp <- f_prepare_to_save(
   scenarios, 
   reality_new_hosp_adm %>% select(date, new_hosp_smooth), 
   "new_hosp_smooth"
@@ -1305,7 +1171,7 @@ temp <- f_offset_and_prepare_to_save(
 temp <- temp %>% filter(date<=as.Date("2021-06-15")) #stop comparison mid-June before delta variant dominant 
 
 #save data
-write_csv(temp, paste0(output_path, "2021_05_21_new_hosp.csv"))
+f_save_csv_files(temp, output_path, "2021_05_21_new_hosp.csv")
 ```
 
 #### Error
@@ -1318,7 +1184,7 @@ f_graph_error(
   "2021-05-21", 10 #publication date label
   )
 
-write_csv(error, paste0(output_path_error, "2021_05_21_new_hosp_error.csv"))
+f_save_csv_files(error, output_path_error, "2021_05_21_new_hosp_error.csv")
 ```
 
 #### Original {.tabset .tabset-fade}
@@ -1351,7 +1217,7 @@ knitr::include_graphics("source_data/2021_05_21/2021_05_21_fig1G.png")
 
 ### July 26, 2021 {.tabset .tabset-fade .tabset-pills}
 
-Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/variant/Institut_Pasteur_Acceleration_vaccination_et_Delta_20210726.pdf), July 26, 2021. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/delta-variant-dynamic/).
+Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/variant/Institut_Pasteur_Acceleration_vaccination_et_Delta_20210726.pdf){target="_blank"}, July 26, 2021. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/delta-variant-dynamic/){target="_blank"}.
 
 #### Reproduced 
 
@@ -1371,15 +1237,9 @@ f_graph(
   "reality"
 )
 
-#we do not correct the data: 0 offset
-x_reality_offset <- 0
-y_reality_offset <- 0
-x_scenarios_offset <- 0
-y_scenarios_offset <- 0
-
 #prepare and save data
-temp <- f_offset_and_prepare_to_save(scenarios, reality_new_hosp_adm, "new_hosp_smooth")
-write_csv(temp, paste0(output_path, "2021_07_26_new_hosp.csv"))
+temp <- f_prepare_to_save(scenarios, reality_new_hosp_adm, "new_hosp_smooth")
+f_save_csv_files(temp, output_path, "2021_07_26_new_hosp.csv")
 ```
 
 #### Error
@@ -1392,7 +1252,7 @@ f_graph_error(
   "2021-07-26", 50 #publication date label
   )
 
-write_csv(error, paste0(output_path_error, "2021_07_26_new_hosp_error.csv"))
+f_save_csv_files(error, output_path_error, "2021_07_26_new_hosp_error.csv")
 ```
 
 #### Original {.tabset .tabset-fade}
@@ -1413,7 +1273,7 @@ knitr::include_graphics("source_data/2021_07_26/2021_07_26_fig3.png")
 
 ### August 5, 2021 {.tabset .tabset-fade .tabset-pills}
 
-Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/variant/InstitutPasteur_Dynamiques_regionales_des_hospitalisations_20210805.pdf), August 5, 2021. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/delta-variant-dynamic/).
+Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/variant/InstitutPasteur_Dynamiques_regionales_des_hospitalisations_20210805.pdf){target="_blank"}, August 5, 2021. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/delta-variant-dynamic/){target="_blank"}.
 
 #### Reproduced 
 
@@ -1433,15 +1293,9 @@ f_graph(
   "reality"
 ) 
 
-#we do not correct data : 0 offset
-x_reality_offset <- 0
-y_reality_offset <- 0
-x_scenarios_offset <- 0 
-y_scenarios_offset <- 0
-
 #prepare and save data
-temp <- f_offset_and_prepare_to_save(scenarios, reality_new_hosp_adm, "new_hosp_smooth")
-write_csv(temp, paste0(output_path, "2021_08_05_new_hosp.csv"))
+temp <- f_prepare_to_save(scenarios, reality_new_hosp_adm, "new_hosp_smooth")
+f_save_csv_files(temp, output_path, "2021_08_05_new_hosp.csv")
 ```
 
 #### Error
@@ -1454,7 +1308,7 @@ f_graph_error(
   "2021-08-05", 50 #publication date label
   )
 
-write_csv(error, paste0(output_path_error, "2021_08_05_new_hosp_error.csv"))
+f_save_csv_files(error, output_path_error, "2021_08_05_new_hosp_error.csv")
 ```
 
 #### Original {.tabset .tabset-fade}
@@ -1475,7 +1329,7 @@ knitr::include_graphics("source_data/2021_08_05/2021_08_05_C.png")
 
 ### October 4, 2021 {.tabset .tabset-fade .tabset-pills}
 
-Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/scenarios/InstitutPasteur_scenariosCOVID19AutomneHiver_2021.pdf), October 4, 2021. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/fall-winter-scenarios/).
+Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/scenarios/InstitutPasteur_scenariosCOVID19AutomneHiver_2021.pdf){target="_blank"}, October 4, 2021. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/fall-winter-scenarios/){target="_blank"}.
 
 #### Reproduced 
 
@@ -1495,16 +1349,10 @@ f_graph(
   "reality"
 )
 
-#we do not correct data: 0 offset
-x_reality_offset <- 0
-y_reality_offset <- 0
-x_scenarios_offset <- 0
-y_scenarios_offset <- 0
-
 #prepare and save data
-temp <- f_offset_and_prepare_to_save(scenarios, reality_new_hosp_adm, "new_hosp_smooth")
+temp <- f_prepare_to_save(scenarios, reality_new_hosp_adm, "new_hosp_smooth")
 temp <- temp %>% filter(date <= as.Date("2021-12-15")) #stop comparison before Omicron dominance in mid-December
-write_csv(temp, paste0(output_path, "2021_10_04_new_hosp.csv"))
+f_save_csv_files(temp, output_path, "2021_10_04_new_hosp.csv")
 ```
 
 #### Error
@@ -1517,7 +1365,7 @@ f_graph_error(
   "2021-10-04", -10 #publication date label
   )
 
-write_csv(error, paste0(output_path_error, "2021_10_04_new_hosp_error.csv"))
+f_save_csv_files(error, output_path_error, "2021_10_04_new_hosp_error.csv")
 ```
 
 #### Original {.tabset .tabset-fade}
@@ -1532,7 +1380,7 @@ knitr::include_graphics("source_data/2021_10_04/2021_10_04.png")
 
 ### January 7, 2022 {.tabset .tabset-fade .tabset-pills}
 
-Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/variant/InstitutPasteur_Complement_Analyse_Impact_Omicron_20220107_corrige.pdf), January 7, 2022. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/omicron-variant-epidemic/).
+Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/variant/InstitutPasteur_Complement_Analyse_Impact_Omicron_20220107_corrige.pdf){target="_blank"}, January 7, 2022. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/omicron-variant-epidemic/){target="_blank"}.
 
 #### Reproduced 
 
@@ -1556,15 +1404,9 @@ f_graph(
     aes(date, new_hosp), alpha = .4, color = "red"
   )
 
-#we do not correct the data: 0 offset
-x_reality_offset <- 0
-y_reality_offset <- 0
-x_scenarios_offset <- 0
-y_scenarios_offset <- 0
-
 #prepare and save data
-temp <- f_offset_and_prepare_to_save(scenarios, reality_new_hosp_adm, "new_hosp_smooth")
-write_csv(temp, paste0(output_path, "2022_01_07_new_hosp.csv"))
+temp <- f_prepare_to_save(scenarios, reality_new_hosp_adm, "new_hosp_smooth")
+f_save_csv_files(temp, output_path, "2022_01_07_new_hosp.csv")
 ```
 
 #### Error
@@ -1578,7 +1420,7 @@ f_graph_error(
   ) +
   xlim(as.Date(NA), as.Date("2022-02-15")) #we do not have reality data past Feb 11
 
-write_csv(error, paste0(output_path_error, "2022_01_07_new_hosp_error.csv"))
+f_save_csv_files(error, output_path_error, "2022_01_07_new_hosp_error.csv")
 ```
 
 
@@ -1602,7 +1444,7 @@ knitr::include_graphics("source_data/2022_01_07/2022_01_07_new_hosp.png")
 
 ```{r}
 #remove temporary variables
-rm(x_reality_offset, x_scenarios_offset, y_reality_offset, y_scenarios_offset, error, temp, temp2, scenarios)
+rm(error, temp, temp2, scenarios)
 ```
 
 
@@ -1650,13 +1492,19 @@ data_new_hosp <- bind_rows(lapply(
 data_ICU_beds <- f_gather_scenarios_compute_relative_error(data_ICU_beds, max_ICU_beds)
 data_new_hosp <- f_gather_scenarios_compute_relative_error(data_new_hosp, max_new_hosp)
 
-# remove scenarios data before report publication date
+# remove scenarios data before report publication date; remove empty values
 data_ICU_beds <- data_ICU_beds %>%
   group_by(report) %>%
-  filter(date>=as.Date(report))
+  filter(
+    date>=as.Date(report),
+    is.na(value)==F
+    )
 data_new_hosp <- data_new_hosp %>%
   group_by(report) %>%
-  filter(date>=as.Date(report))
+  filter(
+    date>=as.Date(report),
+    is.na(value)==F
+    )
 ```
 
 ```{r}
@@ -1675,8 +1523,6 @@ scenarios_rel_duration <- scenarios_duration /(first_wave_duration+scenarios_dur
 
 
 ### ICU
-
-Comparison of all Pasteur Institute's scenarios on ICU beds occupancy to reality.
 
 ```{r graph_all_ICU}
 # get max error for color scale
@@ -1713,6 +1559,10 @@ report_dates_ICU$place[report_dates_ICU$place=="2021-08-05"] <- report_dates_ICU
 ```{r all_ICU_beds_graph}
 # pane of reality data only for 1st wave to show peak
 g1_first_wave <- ggplot(reality_ICU_beds %>% filter(date<date_first_wave_max)) +
+  
+  #1st lockdown
+  #annotate(geom = "rect", xmin = as.Date("2020-03-17"), xmax = as.Date("2020-05-11"), ymin = -Inf, ymax=Inf, alpha=.2) +
+  
   # line of real ICU beds occupancy
   geom_line(
     aes(date, ICU_beds, linetype="reality")
@@ -1742,6 +1592,16 @@ g1_first_wave <- ggplot(reality_ICU_beds %>% filter(date<date_first_wave_max)) +
 
 # pane of scenarios vs reality
 g1_scenarios <- ggplot(data_ICU_beds) +
+  
+  #2nd lockdown
+  #annotate(geom = "rect", xmin = as.Date("2020-10-30"), xmax = as.Date("2020-12-15"), ymin = -Inf, ymax=Inf, alpha=.2) +
+  
+  #3rd lockdown
+  #annotate(geom = "rect", xmin = as.Date("2021-03-19"), xmax = as.Date("2021-05-03"), ymin = -Inf, ymax=Inf, alpha=.2) +
+  
+  #curfew
+  #annotate(geom = "segment", x = as.Date("2020-12-15"), xend = as.Date("2021-06-20"), y = 12000, yend=12000) +
+  #annotate(geom="text", x = as.Date("2020-12-15"), y = 12000, label = "national curfew", color = "black", fontface = "italic", family = "Times New Roman", vjust=0, hjust=0) +
   
   #dates of reports on x axis
   geom_rug(
@@ -1809,8 +1669,6 @@ f_save_graph_pdf_png(
 
 
 ### New hospitalizations
-
-Comparison of all Pasteur Institute's scenarios on hospital admissions to reality.
 
 ```{r prepare_all_new_hosp}
 #max error for color scale
@@ -2152,7 +2010,7 @@ f_save_graph_pdf_png(
 
 ## Short-term changes
 
-In some cases the reports are published just a few weeks apart. In theses cases we compare the short-term changes in the scenarios dynamics. The 3 case studies are a) winter 2021, b) spring 2021, c) summer 2021.
+In some cases the reports are published just a few weeks apart. In theses cases we compare the short-term changes in the scenarios dynamics. The 3 case studies are a-b) winter 2021, c) spring 2021, d) summer 2021.
 
 ```{r short_term_changes}
 #function for short-term scenarios changes
@@ -2243,55 +2101,6 @@ f_save_graph_pdf_png(
 
 # Other figures and appendix {.tabset .tabset-fade .tabset-pills}
 
-## Winter 2021 curfew discussion
-
-```{r}
-#gather jan 16, Feb 2 and Feb 14 scenarios
-temp <- data_new_hosp %>%
-    select(report, date, reality, scenario_type, value, report_date) %>%
-    filter(report_date %in% c("2021-01-16", "2021-02-02", "2021-02-14"))
-#order the reports for graph
-temp$report <- factor(
-  temp$report,
-  levels = c(
-    "Jan 16, 2021",
-    "Feb 02, 2021", 
-    "Feb 14, 2021"
-  )
-)
-
-#graph
-ggplot(temp) +
-  geom_line(
-    aes(date, value, group=scenario_type, color="scenarios"), 
-    linewidth=1
-    ) +
-  geom_line(
-    data = reality_new_hosp_adm,
-    aes(date, new_hosp, color="reality"), 
-    alpha=.2
-    ) +
-  geom_line(
-    data = reality_new_hosp_adm,
-    aes(date, new_hosp_smooth, color="reality"), 
-    linewidth=1
-    ) +
-  geom_vline(data = temp, aes(xintercept = as.Date(report_date)), linetype="dashed") +
-  facet_wrap(vars(report), nrow=1)  +
-  scale_color_manual(values=c('#ff0000','#D8D8D8')) +
-  labs(
-    x=element_blank(), y="hospital admissions", color=element_blank(),
-    subtitle = "vertical line: publication date"
-  ) +
-  xlim(as.Date("2021-01-01"), as.Date("2021-04-01"))
-
-#save
-f_save_graph_pdf_png(
-  "../graphs/raw_comparisons/curfew_discussion",
-  7, 4, dpi_resolution
-)
-```
-
 ## Illegitimate comparisons {.tabset .tabset-fade}
 
 ### Feb 02, 2021
@@ -2377,441 +2186,459 @@ f_save_graph_pdf_png(
 
 
 
-# Region Ile-de-France scenarios
 
 
 
-## Prepare Scenarios ICU
 
 
 
 
-### April 12, 2020, Ile-de-France {.tabset .tabset-fade .tabset-pills}
 
-Source: [EPIcx repor 9](https://medecine.sorbonne-universite.fr/wp-content/uploads/2020/04/report_lockdown-idf-inserm-fr.pdf) (and in English [here](https://www.epicx-lab.com/uploads/9/6/9/4/9694133/inserm-covid-19_report_lockdown_idf-20200412.pdf)), April 12, 2020, and the associated [preprint](https://www.medrxiv.org/content/10.1101/2020.04.13.20063933v1) published on April 17. We extracted the figures from the preprint.
 
-#### Reproduced {.tabset .tabset-fade}
 
-We add a slight 3 days offset to the scenarios, for better alignment with reality data.
+<!-- # Region Ile-de-France scenarios -->
 
-```{r }
-#offset values
-x_reality_offset <- 0
-y_reality_offset <- 0
-x_scenarios_offset <- -3
-y_scenarios_offset <- 0
-```
 
-##### Before correction 
 
-```{r 2020_04_12_EPIcx}
-scenarios <- read_csv("source_data/2020_04_12/ICU.csv") %>%
-  mutate(date = as.Date(date, format = "%Y/%m/%d", optional = T))
+<!-- ## Prepare Scenarios ICU -->
 
-f_graph(
-  reality_ICU_beds_IDF, scenarios, 
-  "ICU_beds", 
-  "2020-04-12", 200, #publication date label
-  "2020-03-01", "2020-07-20", #date limits
-  3000, # y limits
-  "ICU beds in Ile-de-France", #y axis label
-  "reality in Paireau et. al" #reality label
-)
-```
 
-##### After correction
 
-```{r}
-temp <- f_offset_and_prepare_to_save(scenarios, reality_ICU_beds_IDF, "ICU_beds")
 
-f_graph_corrected(
-  temp, 
-  "2020-04-12", 200, #publication date label
-  "2020-03-01", "2020-07-20", #date limits
-  3000, # y limits
-  "Intensive care beds in Ile-de-France", 
-  "reality in Paireau et. al"
-)
+<!-- ### April 12, 2020, Ile-de-France {.tabset .tabset-fade .tabset-pills} -->
 
-write_csv(temp, paste0(output_path, "2020_04_12_ICU.csv"))
-```
+<!-- Source: [EPIcx repor 9](https://medecine.sorbonne-universite.fr/wp-content/uploads/2020/04/report_lockdown-idf-inserm-fr.pdf) (and in English [here](https://www.epicx-lab.com/uploads/9/6/9/4/9694133/inserm-covid-19_report_lockdown_idf-20200412.pdf)), April 12, 2020, and the associated [preprint](https://www.medrxiv.org/content/10.1101/2020.04.13.20063933v1) published on April 17. We extracted the figures from the preprint. -->
 
-#### Error
+<!-- #### Reproduced {.tabset .tabset-fade} -->
 
-```{r}
-error <- f_compute_error("2020-03-01", "2020-07-01", temp, max_ICU_beds_IDF)
+<!-- We add a slight 3 days offset to the scenarios, for better alignment with reality data. -->
 
-f_graph_error(
-  error,
-  "2020-04-12", 100 #publication date label
-  ) 
+<!-- ```{r } -->
+<!-- #offset values -->
+<!-- x_reality_offset <- 0 -->
+<!-- y_reality_offset <- 0 -->
+<!-- x_scenarios_offset <- -3 -->
+<!-- y_scenarios_offset <- 0 -->
+<!-- ``` -->
 
-write_csv(error, paste0(output_path_error, "2020_04_12_ICU_error.csv"))
-```
+<!-- ##### Before correction  -->
 
+<!-- ```{r 2020_04_12_EPIcx} -->
+<!-- scenarios <- read_csv("source_data/2020_04_12/ICU.csv") %>% -->
+<!--   mutate(date = as.Date(date, format = "%Y/%m/%d", optional = T)) -->
 
-#### Original {.tabset .tabset-fade}
+<!-- f_graph( -->
+<!--   reality_ICU_beds_IDF, scenarios,  -->
+<!--   "ICU_beds",  -->
+<!--   "2020-04-12", 200, #publication date label -->
+<!--   "2020-03-01", "2020-07-20", #date limits -->
+<!--   3000, # y limits -->
+<!--   "ICU beds in Ile-de-France", #y axis label -->
+<!--   "reality in Paireau et. al" #reality label -->
+<!-- ) -->
+<!-- ``` -->
 
-##### Fig 7b and 7d
+<!-- ##### After correction -->
 
-```{r 2020_04_12_original_fig6d, echo=FALSE, out.width="500px"}
-knitr::include_graphics("source_data/2020_04_12/2020_04_12_fig7b_7d.png")
-```
+<!-- ```{r} -->
+<!-- temp <- f_prepare_to_save(scenarios, reality_ICU_beds_IDF, "ICU_beds") -->
 
-##### Fig 5b for reality
+<!-- f_graph_corrected( -->
+<!--   temp,  -->
+<!--   "2020-04-12", 200, #publication date label -->
+<!--   "2020-03-01", "2020-07-20", #date limits -->
+<!--   3000, # y limits -->
+<!--   "Intensive care beds in Ile-de-France",  -->
+<!--   "reality in Paireau et. al" -->
+<!-- ) -->
 
-```{r 2020_04_12_original_figS3b, echo=FALSE, out.width="500px"}
-knitr::include_graphics("source_data/2020_04_12/2020_04_12_figure5b_reality.png")
-```
+<!-- f_save_csv_files(temp, output_path, "2020_04_12_ICU.csv") -->
+<!-- ``` -->
 
+<!-- #### Error -->
 
+<!-- ```{r} -->
+<!-- error <- f_compute_error("2020-03-01", "2020-07-01", temp, max_ICU_beds_IDF) -->
 
+<!-- f_graph_error( -->
+<!--   error, -->
+<!--   "2020-04-12", 100 #publication date label -->
+<!--   )  -->
 
+<!-- f_save_csv_files(error, output_path_error, "2020_04_12_ICU_error.csv") -->
+<!-- ``` -->
 
 
-### April 28, 2020, Ile-de-France {.tabset .tabset-fade .tabset-pills}
+<!-- #### Original {.tabset .tabset-fade} -->
 
-Source: [Les Echos newspaper](https://www.lesechos.fr/idees-debats/editos-analyses/pourquoi-philippe-a-douche-les-francais-1199309), April 29, 2020. Specified "dated Tuesday", so we deduce that the publication dates from Tuesday April 28. Identified by Google search.
+<!-- ##### Fig 7b and 7d -->
 
-#### Reproduced 
+<!-- ```{r 2020_04_12_original_fig6d, echo=FALSE, out.width="500px"} -->
+<!-- knitr::include_graphics("source_data/2020_04_12/2020_04_12_fig7b_7d.png") -->
+<!-- ``` -->
 
-We add a slight vertical offset (150 beds, or about 6% of the 2500 peak value), for better alignment with reality data.
+<!-- ##### Fig 5b for reality -->
 
-```{r}
-# we do not correct the data: offset 0
-x_reality_offset <- 0
-y_reality_offset <- -150
-x_scenarios_offset <- 0
-y_scenarios_offset <- 0
-```
+<!-- ```{r 2020_04_12_original_figS3b, echo=FALSE, out.width="500px"} -->
+<!-- knitr::include_graphics("source_data/2020_04_12/2020_04_12_figure5b_reality.png") -->
+<!-- ``` -->
 
 
-##### Before correction 
 
-```{r 2020_04_28_Pasteur}
-# load scenario
-scenarios <- read_csv("source_data/2020_04_28/ICU.csv") %>%
-  mutate(date = as.Date(date, format = "%Y/%m/%d", optional = T))
 
-# graph comparison
-f_graph(
-  reality_ICU_beds_IDF, scenarios, 
-  "ICU_beds", 
-  "2020-04-28", 1000, #publication date label
-  "2020-03-19", "2020-06-28", #date limits
-  NA, # y limits
-  "ICU beds in Ile-de-France", #y axis label
-  "reality in Paireau et. al" #reality label
-)
 
-```
 
-##### After correction
+<!-- ### April 28, 2020, Ile-de-France {.tabset .tabset-fade .tabset-pills} -->
 
-```{r}
-temp <- f_offset_and_prepare_to_save(scenarios, reality_ICU_beds_IDF, "ICU_beds")
+<!-- Source: [Les Echos newspaper](https://www.lesechos.fr/idees-debats/editos-analyses/pourquoi-philippe-a-douche-les-francais-1199309), April 29, 2020. Specified "dated Tuesday", so we deduce that the publication dates from Tuesday April 28. Identified by Google search. -->
 
-f_graph_corrected(
-  temp, 
-  "2020-04-28", 1000, #publication date label
-  "2020-03-19", "2020-06-28", #date limits
-  NA, # y limits
-  "ICU beds in Ile-de-France", #y axis label
-  "reality in Paireau et. al" #reality label
-)
+<!-- #### Reproduced  -->
 
-write_csv(temp, paste0(output_path, "2020_04_28_ICU.csv"))
-```
+<!-- We add a slight vertical offset (150 beds, or about 6% of the 2500 peak value), for better alignment with reality data. -->
 
+<!-- ```{r} -->
+<!-- # we do not correct the data: offset 0 -->
+<!-- x_reality_offset <- 0 -->
+<!-- y_reality_offset <- -150 -->
+<!-- x_scenarios_offset <- 0 -->
+<!-- y_scenarios_offset <- 0 -->
+<!-- ``` -->
 
-#### Error
 
-```{r}
-error <- f_compute_error("2020-03-29", "2020-06-28", temp, max_ICU_beds_IDF)
+<!-- ##### Before correction  -->
 
-f_graph_error(
-  error,
-  "2020-04-28", 50 #publication date label
-  ) 
+<!-- ```{r 2020_04_28_Pasteur} -->
+<!-- # load scenario -->
+<!-- scenarios <- read_csv("source_data/2020_04_28/ICU.csv") %>% -->
+<!--   mutate(date = as.Date(date, format = "%Y/%m/%d", optional = T)) -->
 
-write_csv(error, paste0(output_path_error, "2020_04_28_ICU_error.csv"))
-```
+<!-- # graph comparison -->
+<!-- f_graph( -->
+<!--   reality_ICU_beds_IDF, scenarios,  -->
+<!--   "ICU_beds",  -->
+<!--   "2020-04-28", 1000, #publication date label -->
+<!--   "2020-03-19", "2020-06-28", #date limits -->
+<!--   NA, # y limits -->
+<!--   "ICU beds in Ile-de-France", #y axis label -->
+<!--   "reality in Paireau et. al" #reality label -->
+<!-- ) -->
 
-#### Original 
+<!-- ``` -->
 
-```{r 2020_04_28_original, echo=FALSE, out.width="500px"}
-knitr::include_graphics("source_data/2020_04_28/2020_04_28.png")
-```
+<!-- ##### After correction -->
 
+<!-- ```{r} -->
+<!-- temp <- f_prepare_to_save(scenarios, reality_ICU_beds_IDF, "ICU_beds") -->
 
-### May 12, 2020, Ile-de-France {.tabset .tabset-fade .tabset-pills}
+<!-- f_graph_corrected( -->
+<!--   temp,  -->
+<!--   "2020-04-28", 1000, #publication date label -->
+<!--   "2020-03-19", "2020-06-28", #date limits -->
+<!--   NA, # y limits -->
+<!--   "ICU beds in Ile-de-France", #y axis label -->
+<!--   "reality in Paireau et. al" #reality label -->
+<!-- ) -->
 
-voir comment on justifie l'offset: relire la fonction. A priori descendre les scénarios de 200, mais je ne peux pas descendre les points noirs, juste bouger la ligne rouge. Cela pose problème pour la sauvegarde et la figure globale ?
+<!-- f_save_csv_files(temp, output_path, "2020_04_28_ICU.csv") -->
+<!-- ``` -->
 
-Source: [EPIcx report 10](https://www.medrxiv.org/content/10.1101/2020.05.08.20095521v1.full.pdf), published on May 12, 2020.
 
-TO BE RE CHECKED
+<!-- #### Error -->
 
-#### Reproduced {.tabset .tabset-fade}
+<!-- ```{r} -->
+<!-- error <- f_compute_error("2020-03-29", "2020-06-28", temp, max_ICU_beds_IDF) -->
 
-We add a small vertical offset (100 beds, orr about 3% of the 3000 peak value) for better alignment of scenario with reality.
+<!-- f_graph_error( -->
+<!--   error, -->
+<!--   "2020-04-28", 50 #publication date label -->
+<!--   )  -->
 
-```{r}
-#offset values
-x_reality_offset <- 0
-y_reality_offset <- 0
-x_scenarios_offset <- 0
-y_scenarios_offset <- -100
-```
+<!-- f_save_csv_files(error, output_path_error, "2020_04_28_ICU_error.csv") -->
+<!-- ``` -->
 
-##### Before correction
+<!-- #### Original  -->
 
-```{r 2020_10_30}
-scenarios <- read_csv("source_data/2020_05_12/ICU.csv") %>%
-  mutate(date = as.Date(date, format = "%Y/%m/%d", optional = T))
+<!-- ```{r 2020_04_28_original, echo=FALSE, out.width="500px"} -->
+<!-- knitr::include_graphics("source_data/2020_04_28/2020_04_28.png") -->
+<!-- ``` -->
 
-f_graph(
-  reality_ICU_beds_IDF, scenarios, 
-  "ICU_beds", 
-  "2020-05-12", 3000, #publication date label
-  "2020-03-01", "2020-08-01", #date limits
-  NA, # y limits
-  "ICU beds",
-  "reality in data.gouv"
-)
-```
 
-##### After correction
+<!-- ### May 12, 2020, Ile-de-France {.tabset .tabset-fade .tabset-pills} -->
 
-```{r}
-temp <- f_offset_and_prepare_to_save(
-  scenarios, 
-  reality_ICU_beds_IDF, 
-  "ICU_beds"
-  )
+<!-- voir comment on justifie l'offset: relire la fonction. A priori descendre les scénarios de 200, mais je ne peux pas descendre les points noirs, juste bouger la ligne rouge. Cela pose problème pour la sauvegarde et la figure globale ? -->
 
-f_graph_corrected(
-  temp, 
-  "2020-05-12", 3000, #publication date label
-  "2020-03-01", "2020-08-01", #date limits
-  NA, # y limits
-  "ICU beds", 
-  "reality in data.gouv"
-)
+<!-- Source: [EPIcx report 10](https://www.medrxiv.org/content/10.1101/2020.05.08.20095521v1.full.pdf), published on May 12, 2020. -->
 
-#end of 2nd lockdown December 15, which is also the end of the scenarios
-write_csv(temp, paste0(output_path, "2020_05_12_ICU.csv"))
-```
+<!-- TO BE RE CHECKED -->
 
-#### Error
+<!-- #### Reproduced {.tabset .tabset-fade} -->
 
-```{r}
-error <- f_compute_error("2020-03-01", "2020-08-01", temp, max_ICU_beds_IDF)
+<!-- We add a small vertical offset (100 beds, orr about 3% of the 3000 peak value) for better alignment of scenario with reality. -->
 
-f_graph_error(
-  error,
-  "2020-05-12", 50 #publication date label
-  )
+<!-- ```{r} -->
+<!-- #offset values -->
+<!-- x_reality_offset <- 0 -->
+<!-- y_reality_offset <- 0 -->
+<!-- x_scenarios_offset <- 0 -->
+<!-- y_scenarios_offset <- -100 -->
+<!-- ``` -->
 
-write_csv(error, paste0(output_path_error, "2020_05_12_ICU.csv_error.csv"))
-```
+<!-- ##### Before correction -->
 
-#### Orginal
+<!-- ```{r 2020_10_30} -->
+<!-- scenarios <- read_csv("source_data/2020_05_12/ICU.csv") %>% -->
+<!--   mutate(date = as.Date(date, format = "%Y/%m/%d", optional = T)) -->
 
-```{r 2020_05_12_original, echo=FALSE, out.width="500px"}
-knitr::include_graphics("source_data/2020_05_12/2020_05_12_fig5f.png")
-```
+<!-- f_graph( -->
+<!--   reality_ICU_beds_IDF, scenarios,  -->
+<!--   "ICU_beds",  -->
+<!--   "2020-05-12", 3000, #publication date label -->
+<!--   "2020-03-01", "2020-08-01", #date limits -->
+<!--   NA, # y limits -->
+<!--   "ICU beds", -->
+<!--   "reality in data.gouv" -->
+<!-- ) -->
+<!-- ``` -->
 
+<!-- ##### After correction -->
 
+<!-- ```{r} -->
+<!-- temp <- f_prepare_to_save( -->
+<!--   scenarios,  -->
+<!--   reality_ICU_beds_IDF,  -->
+<!--   "ICU_beds" -->
+<!--   ) -->
 
+<!-- f_graph_corrected( -->
+<!--   temp,  -->
+<!--   "2020-05-12", 3000, #publication date label -->
+<!--   "2020-03-01", "2020-08-01", #date limits -->
+<!--   NA, # y limits -->
+<!--   "ICU beds",  -->
+<!--   "reality in data.gouv" -->
+<!-- ) -->
 
+<!-- #end of 2nd lockdown December 15, which is also the end of the scenarios -->
+<!-- f_save_csv_files(temp, output_path, "2020_05_12_ICU.csv") -->
+<!-- ``` -->
 
-## Prepare Scenarios New Hospitalizations
+<!-- #### Error -->
 
+<!-- ```{r} -->
+<!-- error <- f_compute_error("2020-03-01", "2020-08-01", temp, max_ICU_beds_IDF) -->
 
-### November 8, 2021, Ile-de-France {.tabset .tabset-fade .tabset-pills}
+<!-- f_graph_error( -->
+<!--   error, -->
+<!--   "2020-05-12", 50 #publication date label -->
+<!--   ) -->
 
-Source: [EPIcx report 21](https://www.epicx-lab.com/uploads/9/6/9/4/9694133/inserm_covid-19-lockdown_schools_open-20201108.pdf), published on Novemebr 11, 2020.
+<!-- f_save_csv_files(error, output_path_error, "2020_05_12_ICU.csv_error.csv") -->
+<!-- ``` -->
 
-#### Reproduced 
+<!-- #### Orginal -->
 
-The apparent discrepancy between median scenario and smoothed reality before the publication date is actually present in the modeler's own report. See the *Original* tab, and compare the black dots to the median scenario.
+<!-- ```{r 2020_05_12_original, echo=FALSE, out.width="500px"} -->
+<!-- knitr::include_graphics("source_data/2020_05_12/2020_05_12_fig5f.png") -->
+<!-- ``` -->
 
-```{r 2020_11_08_EPIcx}
-# load data
-scenarios <- read_csv("source_data/2020_11_08/new_hosp.csv") %>%
-  mutate(date = as.Date(date, format = "%Y/%m/%d", optional = T))
 
-# graph comparison
-f_graph(
-  reality_new_hosp_adm_IDF, scenarios, 
-  "new_hosp_smooth", 
-  "2020-11-08", 700, #publication date label
-  "2020-08-30", "2020-12-15", #date limits
-  600, # y limits
-  "daily hospital admissions",
-  "reality in Paireau et al."
-)  +
-  # add unsmoothed reality new hospitalization, for better comparison with modelers' reality
-  geom_line(
-    data=reality_new_hosp_adm_IDF, aes(date, new_hosp), alpha=.4, color="red"
-  )
-
-# we do not correct the data: no offset
-x_reality_offset <- 0
-y_reality_offset <- 0
-x_scenarios_offset <- 0
-y_scenarios_offset <- 0
-
-# save data
-temp <- f_offset_and_prepare_to_save(
-  scenarios, 
-  reality_new_hosp_adm_IDF %>% select(date, new_hosp_smooth),
-  "new_hosp_smooth"
-  )
-temp <- temp %>% filter(date <= as.Date("2020-12-15")) # stop comparison before ...
-write_csv(temp, paste0(output_path, "2020_11_08_new_hosp.csv"))
-```
-
-
-#### Error
-
-```{r}
-error <- f_compute_error("2020-08-30", "2020-12-31", temp, max_new_hosp_IDF)
-
-f_graph_error(
-  error,
-  "2020-11-08", 20 #publication date label
-  )
-
-write_csv(error, paste0(output_path_error, "2020_11_08_new_hosp_error.csv"))
-```
-
-
-#### Original 
-
-```{r 2020_11_08_original, echo=FALSE, out.width="50%"}
-knitr::include_graphics("source_data/2020_11_08/2020_11_08_fig2.png")
-```
-
-
-
-## Results
-
-```{r}
-#ICU only in Ile de France region
-data_ICU_beds_IDF <- bind_rows(
-  f_read_ICU("2020_04_12"),
-  f_read_ICU("2020_04_28"),
-  f_read_ICU("2020_05_12")
-)
-#new hosp data for IDF
-data_new_hosp_IDF <- f_read_new_hosp("2020_11_08")
-
-data_ICU_beds_IDF <- f_gather_scenarios_compute_relative_error(data_ICU_beds_IDF, max_ICU_beds_IDF)
-data_new_hosp_IDF <- f_gather_scenarios_compute_relative_error(data_new_hosp_IDF, max_new_hosp_IDF)
-```
-
-
-#### ICU
-
-```{r graph_all_ICU_IDF}
-max_error <- max(abs(data_ICU_beds_IDF$error), na.rm = T)
-g1 <- ggplot(data_ICU_beds_IDF) +
-  
-  #scenarios curves and their colors
-  geom_line(
-    aes(date, value, group=interaction(scenario_type, report), color=abs(error)), 
-    linewidth=1.5
-    ) +
-  scale_colour_stepsn(
-    colours = c("green", "orange", "red", "purple"), 
-    values = c(0, 15, 30, 100, round(max_error))/max_error,
-    breaks = c(0, 15, 30, 100, round(max_error)),
-    labels = c("0%", "± 15%", "± 30%", "± 100%", ""),
-  ) +
-  
-  #reality curve
-  geom_line(
-    data=reality_ICU_beds_IDF,
-    aes(date, ICU_beds)
-    ) +
-  
-  #1st wave peak annotation
-  geom_hline(
-    yintercept = max_ICU_beds_IDF, linetype="dashed"
-    ) +
-  annotate(
-    'text', x = as.Date("2020-09-15"), y = max_ICU_beds_IDF, label = "1st wave peak",
-    color = "black", fontface = "italic", family = "Times New Roman", vjust=-.4, hjust=0
-    ) +
-  
-  labs(
-    x = element_blank(),
-    y="ICU beds\noccupied by COVID-patients",
-    color=" error of scenario\n  as % of\n 1st wave peak",
-    linetype= element_blank()
-    ) +
-  coord_cartesian(
-    ylim = c(0, NA),
-    xlim = c(as.Date("2020-03-01"), as.Date("2020-08-01"))
-    ) +
-  facet_wrap(vars(report), nrow=2)
-g1
-```
-
-#### New hospitalizations TO BE FINISHED
-
-```{r graph_all_new_hosp_IDF}
-max_error <- max(abs(data_new_hosp_IDF$error), na.rm = T)
-g2 <- ggplot(data_new_hosp_IDF) +
-
-  #scenarios curves and their colors
-  geom_line(
-    aes(date, value, group=interaction(scenario_type, report), color=abs(error)),
-    linewidth=1.5
-    ) +
-  # scale_colour_stepsn(
-  #   colours = c("green", "orange", "red"),
-  #   values = c(0, 15, 30, 100, round(max_error))/max_error,
-  #   breaks = c(0, 15, 30, 100, round(max_error)),
-  #   labels = c("0%", "± 15%", "± 30%", "± 100%", ""),
-  # ) +
-
-  #reality curve
-  geom_line(
-    data=reality_new_hosp_adm_IDF,
-    aes(date, new_hosp_smooth)
-    ) +
-  #unsmoothed reality curve
-  geom_line(
-    data=reality_new_hosp_adm_IDF,
-    aes(date, new_hosp), alpha=.4
-    ) +
-
-  #1st wave peak
-  geom_hline(yintercept = max_new_hosp_IDF, linetype="dashed") +
-  annotate(
-    'text', x = as.Date("2020-09-15"), y = max_new_hosp_IDF, label = "1st wave peak",
-    color = "black", fontface = "italic", family = "Times New Roman", vjust=-.4, hjust=0
-    ) +
-
-  labs(
-    x = paste("publication dates of the", n_reports, "reports"),
-    y="daily new hospital admissions\nrelated to COVID",
-    color=" error of scenario\n  as % of\n 1st wave peak",
-    linetype= element_blank()
-    ) +
-  coord_cartesian(
-    ylim = c(0, NA),
-    xlim = c(as.Date("2020-10-01"), as.Date("2020-12-31"))
-    ) +
-  facet_wrap(vars(report))
-g2
-
-library(patchwork)
-g1 + g2
-```
+
+
+
+<!-- ## Prepare Scenarios New Hospitalizations -->
+
+
+<!-- ### November 8, 2021, Ile-de-France {.tabset .tabset-fade .tabset-pills} -->
+
+<!-- Source: [EPIcx report 21](https://www.epicx-lab.com/uploads/9/6/9/4/9694133/inserm_covid-19-lockdown_schools_open-20201108.pdf), published on Novemebr 11, 2020. -->
+
+<!-- #### Reproduced  -->
+
+<!-- The apparent discrepancy between median scenario and smoothed reality before the publication date is actually present in the modeler's own report. See the *Original* tab, and compare the black dots to the median scenario. -->
+
+<!-- ```{r 2020_11_08_EPIcx} -->
+<!-- # load data -->
+<!-- scenarios <- read_csv("source_data/2020_11_08/new_hosp.csv") %>% -->
+<!--   mutate(date = as.Date(date, format = "%Y/%m/%d", optional = T)) -->
+
+<!-- # graph comparison -->
+<!-- f_graph( -->
+<!--   reality_new_hosp_adm_IDF, scenarios,  -->
+<!--   "new_hosp_smooth",  -->
+<!--   "2020-11-08", 700, #publication date label -->
+<!--   "2020-08-30", "2020-12-15", #date limits -->
+<!--   600, # y limits -->
+<!--   "daily hospital admissions", -->
+<!--   "reality in Paireau et al." -->
+<!-- )  + -->
+<!--   # add unsmoothed reality new hospitalization, for better comparison with modelers' reality -->
+<!--   geom_line( -->
+<!--     data=reality_new_hosp_adm_IDF, aes(date, new_hosp), alpha=.4, color="red" -->
+<!--   ) -->
+
+<!-- # we do not correct the data: no offset -->
+<!-- x_reality_offset <- 0 -->
+<!-- y_reality_offset <- 0 -->
+<!-- x_scenarios_offset <- 0 -->
+<!-- y_scenarios_offset <- 0 -->
+
+<!-- # save data -->
+<!-- temp <- f_prepare_to_save( -->
+<!--   scenarios,  -->
+<!--   reality_new_hosp_adm_IDF %>% select(date, new_hosp_smooth), -->
+<!--   "new_hosp_smooth" -->
+<!--   ) -->
+<!-- temp <- temp %>% filter(date <= as.Date("2020-12-15")) # stop comparison before ... -->
+<!-- f_save_csv_files(temp, output_path, "2020_11_08_new_hosp.csv") -->
+<!-- ``` -->
+
+
+<!-- #### Error -->
+
+<!-- ```{r} -->
+<!-- error <- f_compute_error("2020-08-30", "2020-12-31", temp, max_new_hosp_IDF) -->
+
+<!-- f_graph_error( -->
+<!--   error, -->
+<!--   "2020-11-08", 20 #publication date label -->
+<!--   ) -->
+
+<!-- f_save_csv_files(error, output_path_error, "2020_11_08_new_hosp_error.csv") -->
+<!-- ``` -->
+
+
+<!-- #### Original  -->
+
+<!-- ```{r 2020_11_08_original, echo=FALSE, out.width="50%"} -->
+<!-- knitr::include_graphics("source_data/2020_11_08/2020_11_08_fig2.png") -->
+<!-- ``` -->
+
+
+
+<!-- ## Results -->
+
+<!-- ```{r} -->
+<!-- #ICU only in Ile de France region -->
+<!-- data_ICU_beds_IDF <- bind_rows( -->
+<!--   f_read_ICU("2020_04_12"), -->
+<!--   f_read_ICU("2020_04_28"), -->
+<!--   f_read_ICU("2020_05_12") -->
+<!-- ) -->
+<!-- #new hosp data for IDF -->
+<!-- data_new_hosp_IDF <- f_read_new_hosp("2020_11_08") -->
+
+<!-- data_ICU_beds_IDF <- f_gather_scenarios_compute_relative_error(data_ICU_beds_IDF, max_ICU_beds_IDF) -->
+<!-- data_new_hosp_IDF <- f_gather_scenarios_compute_relative_error(data_new_hosp_IDF, max_new_hosp_IDF) -->
+<!-- ``` -->
+
+
+<!-- #### ICU -->
+
+<!-- ```{r graph_all_ICU_IDF} -->
+<!-- max_error <- max(abs(data_ICU_beds_IDF$error), na.rm = T) -->
+<!-- g1 <- ggplot(data_ICU_beds_IDF) + -->
+
+<!--   #scenarios curves and their colors -->
+<!--   geom_line( -->
+<!--     aes(date, value, group=interaction(scenario_type, report), color=abs(error)),  -->
+<!--     linewidth=1.5 -->
+<!--     ) + -->
+<!--   scale_colour_stepsn( -->
+<!--     colours = c("green", "orange", "red", "purple"),  -->
+<!--     values = c(0, 15, 30, 100, round(max_error))/max_error, -->
+<!--     breaks = c(0, 15, 30, 100, round(max_error)), -->
+<!--     labels = c("0%", "± 15%", "± 30%", "± 100%", ""), -->
+<!--   ) + -->
+
+<!--   #reality curve -->
+<!--   geom_line( -->
+<!--     data=reality_ICU_beds_IDF, -->
+<!--     aes(date, ICU_beds) -->
+<!--     ) + -->
+
+<!--   #1st wave peak annotation -->
+<!--   geom_hline( -->
+<!--     yintercept = max_ICU_beds_IDF, linetype="dashed" -->
+<!--     ) + -->
+<!--   annotate( -->
+<!--     'text', x = as.Date("2020-09-15"), y = max_ICU_beds_IDF, label = "1st wave peak", -->
+<!--     color = "black", fontface = "italic", family = "Times New Roman", vjust=-.4, hjust=0 -->
+<!--     ) + -->
+
+<!--   labs( -->
+<!--     x = element_blank(), -->
+<!--     y="ICU beds\noccupied by COVID-patients", -->
+<!--     color=" error of scenario\n  as % of\n 1st wave peak", -->
+<!--     linetype= element_blank() -->
+<!--     ) + -->
+<!--   coord_cartesian( -->
+<!--     ylim = c(0, NA), -->
+<!--     xlim = c(as.Date("2020-03-01"), as.Date("2020-08-01")) -->
+<!--     ) + -->
+<!--   facet_wrap(vars(report), nrow=2) -->
+<!-- g1 -->
+<!-- ``` -->
+
+<!-- #### New hospitalizations TO BE FINISHED -->
+
+<!-- ```{r graph_all_new_hosp_IDF} -->
+<!-- max_error <- max(abs(data_new_hosp_IDF$error), na.rm = T) -->
+<!-- g2 <- ggplot(data_new_hosp_IDF) + -->
+
+<!--   #scenarios curves and their colors -->
+<!--   geom_line( -->
+<!--     aes(date, value, group=interaction(scenario_type, report), color=abs(error)), -->
+<!--     linewidth=1.5 -->
+<!--     ) + -->
+<!--   # scale_colour_stepsn( -->
+<!--   #   colours = c("green", "orange", "red"), -->
+<!--   #   values = c(0, 15, 30, 100, round(max_error))/max_error, -->
+<!--   #   breaks = c(0, 15, 30, 100, round(max_error)), -->
+<!--   #   labels = c("0%", "± 15%", "± 30%", "± 100%", ""), -->
+<!--   # ) + -->
+
+<!--   #reality curve -->
+<!--   geom_line( -->
+<!--     data=reality_new_hosp_adm_IDF, -->
+<!--     aes(date, new_hosp_smooth) -->
+<!--     ) + -->
+<!--   #unsmoothed reality curve -->
+<!--   geom_line( -->
+<!--     data=reality_new_hosp_adm_IDF, -->
+<!--     aes(date, new_hosp), alpha=.4 -->
+<!--     ) + -->
+
+<!--   #1st wave peak -->
+<!--   geom_hline(yintercept = max_new_hosp_IDF, linetype="dashed") + -->
+<!--   annotate( -->
+<!--     'text', x = as.Date("2020-09-15"), y = max_new_hosp_IDF, label = "1st wave peak", -->
+<!--     color = "black", fontface = "italic", family = "Times New Roman", vjust=-.4, hjust=0 -->
+<!--     ) + -->
+
+<!--   labs( -->
+<!--     x = paste("publication dates of the", n_reports, "reports"), -->
+<!--     y="daily new hospital admissions\nrelated to COVID", -->
+<!--     color=" error of scenario\n  as % of\n 1st wave peak", -->
+<!--     linetype= element_blank() -->
+<!--     ) + -->
+<!--   coord_cartesian( -->
+<!--     ylim = c(0, NA), -->
+<!--     xlim = c(as.Date("2020-10-01"), as.Date("2020-12-31")) -->
+<!--     ) + -->
+<!--   facet_wrap(vars(report)) -->
+<!-- g2 -->
+
+<!-- library(patchwork) -->
+<!-- g1 + g2 -->
+<!-- ``` -->
+
+
+
+
+
+
+
+
 
 
 

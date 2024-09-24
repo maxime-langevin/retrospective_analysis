@@ -60,7 +60,8 @@ theme_set(
 # epidemic peaks during 1st wave
 max_new_hosp <- 3036 #historical peak of new hospitalizations
 max_ICU_beds <- 6937 #historical peak of ICU beds
-max_ICU_beds_IDF <- 2668 #historical peak of ICU beds in ile de france region (for Apr 2020 scenario)
+max_new_hosp_IDF <- 1210
+max_ICU_beds_IDF <- 2852 #historical peak of ICU beds in ile de france region (for Apr 2020 scenario)
 dpi_resolution <- 500 #default dpi resolution for our png graphs
 
 # Get the directory of the R Markdown file and set the working directory to the file location

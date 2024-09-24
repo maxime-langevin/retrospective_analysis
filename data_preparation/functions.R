@@ -53,6 +53,18 @@ f_save_graph_pdf_png <- function(path_name, graph_width, graph_height, dpi_resol
   )
 }
 
+#function to save csv files in a directory. If directory does not exist, creates it
+f_save_csv_files <- function(file_to_save, output_path, file_name){
+  
+  # Create the directory recursively if it doesn't exist
+  if (!file.exists(output_path)) {
+    dir.create(output_path, recursive = TRUE)
+  }
+  
+  # Write the CSV file
+  write_csv(file_to_save, file = file.path(output_path, file_name))
+}
+
 
 # Prepare and plot scenarios vs reality -----------------------------------
 
@@ -131,99 +143,27 @@ f_graph <- function(
 }
 
 
-# when modeler's and our reality data are not  perfectly aligned before the report publication date, function to add vertical or horizontal offset to better align
-# then gathers in one same dataset scenarios, our reality data, and modeler's reality data
-f_offset_and_prepare_to_save <- function(
+# gathers in one same dataset scenarios, our reality data, and modeler's reality data
+f_prepare_to_save <- function(
     dataset_scenarios, # scenarios data, which also contains modelers' reality data
     dataset_reality, # our reality data
     variable_select # to select ICU or new hospitalization in our reality dataset
 ){
   
-  # x and y offset in our reality dataset 
+  # reality from in reality dataset 
   temp_reality <- dataset_reality %>% select(date, reality = !!as.symbol(variable_select))
-  temp_reality$date <- temp_reality$date + x_reality_offset # offset on date (x)
-  temp_reality$reality <- temp_reality$reality + y_reality_offset # offset on values (y)
   
   # reality in modeler's report
   temp_reality_report <- dataset_scenarios %>% select(date, reality_report = reality)
   
   # x and y offset in modeler's scenarios
   temp_scenarios <- dataset_scenarios %>% select(-reality)
-  temp_scenarios$date <- temp_scenarios$date + x_scenarios_offset # offset on dates (x)
-  temp_scenarios[,-1] <- lapply(temp_scenarios[,-1], function(x) x+y_scenarios_offset) # offset on values (y)
   
   temp <- full_join(temp_scenarios, temp_reality_report, by="date")
   temp <- left_join(temp, temp_reality)
   
   return(temp)
 }
-
-
-#function to plot reality vs scenarios after the offset correction
-f_graph_corrected <- 
-  function(
-    scenarios, 
-    x_label_publication, 
-    y_label_publication,
-    x_min, x_max, y_max,
-    str_y, str_reality
-  ){
-    modellers_true_data <- scenarios %>%
-      select(date, reality_report)
-    
-    true_data <- scenarios %>%
-      select(date, reality)
-    
-    scenarios <- scenarios %>%
-      select(-reality, -reality_report) %>%
-      gather(key=scenario, value = value, -date)
-    
-    
-    p <- ggplot(data = scenarios) + 
-      #scenarios lines
-      geom_line(
-        aes(
-          x=date, y=value, 
-          group=scenario, color="scenarios"
-        ),
-        size = 1
-      ) + 
-      #reality line
-      geom_line(
-        data= true_data, 
-        aes(
-          x=date, y=reality, 
-          color = str_reality
-        ),
-        size = 1
-      ) +
-      #modellers reality line
-      geom_point(
-        data = modellers_true_data,
-        aes(
-          date, reality_report, color = "reality in report"
-        ) 
-      ) +
-      #publication date line and label
-      geom_vline(
-        xintercept = as.Date(x_label_publication), linetype="dashed"
-      ) +
-      annotate(
-        'text', x = as.Date(x_label_publication)-1, y = y_label_publication, label = "publication\ndate", 
-        color = "black", fontface = "italic", family = "Times New Roman", hjust=1
-      ) +
-      # x and y limits
-      xlim(as.Date(x_min), as.Date(x_max)) + ylim(0, y_max) + 
-      g_theme +
-      labs(
-        title = "",
-        subtitle = "",
-        color = "",
-        x="", y= str_y
-      )
-    
-    return(p)
-  }
 
 
 #function to extract med, min and max scenarios, and compute their relative errors to reality in %. Adds them 6 to the original dataset.
