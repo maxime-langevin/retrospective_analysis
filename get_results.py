@@ -58,11 +58,11 @@ endpoints_normalizations = {
 }
 
 data_location = {
-    "2020/04/12 ICU": "data_preparation/output_data/min_med_max_and_error/ICU_error/2020_04_12_ICU_error.csv",
     "2020/10/30 ICU": "data_preparation/output_data/min_med_max_and_error/ICU_error/2020_10_30_ICU_error.csv",
     "2021/01/16": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_01_16_new_hosp_error.csv",
     "2021/02/02": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_02_02_new_hosp_error.csv",
     "2021/02/08": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_02_08_new_hosp_error.csv",
+    "2021/02/14": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_02_14_new_hosp_error.csv",
     "2021/02/23": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_02_23_new_hosp_error.csv",
     "2021/04/26": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_04_26_new_hosp_error.csv",
     "2021/05/21": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_05_21_new_hosp_error.csv",
@@ -77,11 +77,11 @@ data_location = {
 }
 
 normalizations = {
-    "2020/04/12 ICU": icu_normalization,
     "2020/10/30 ICU": icu_normalization,
     "2021/01/16": new_hosp_normalization,
     "2021/02/02": new_hosp_normalization,
     "2021/02/08": new_hosp_normalization,
+    "2021/02/14": new_hosp_normalization,
     "2021/02/23": new_hosp_normalization,
     "2021/04/26": new_hosp_normalization,
     "2021/05/21": new_hosp_normalization,
@@ -96,10 +96,10 @@ normalizations = {
 }
 
 increasing = {
-    "2020/04/12 ICU": False,
     "2020/10/30 ICU": True,
     "2021/01/16": True,
     "2021/02/02": True,
+    "2021/02/14": True,
     "2021/02/08": True,
     "2021/02/23": True,
     "2021/04/26": False,
@@ -116,7 +116,7 @@ increasing = {
 
 scenario_endpoints = [
     "ICU",
-    "ICU",
+    "New hosp.",
     "New hosp.",
     "New hosp.",
     "New hosp.",
@@ -151,11 +151,11 @@ with open(
 # ------------------------------------------------------------------------------------------------------
 
 data_location = {
-    "2020/04/12 ICU": "data_preparation/output_data/min_med_max_and_error/ICU_error/2020_04_12_ICU_error.csv",
     "2020/10/30 ICU": "data_preparation/output_data/min_med_max_and_error/ICU_error/2020_10_30_ICU_error.csv",
     "2021/01/16": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_01_16_new_hosp_error.csv",
     "2021/02/02": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_02_02_new_hosp_error.csv",
     "2021/02/08": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_02_08_new_hosp_error.csv",
+    "2021/02/14": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_02_14_new_hosp_error.csv",
     "2021/02/23": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_02_23_new_hosp_error.csv",
     "2021/04/26": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_04_26_new_hosp_error.csv",
     "2021/05/21": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_05_21_new_hosp_error.csv",
@@ -170,11 +170,11 @@ data_location = {
 }
 
 normalizations = {
-    "2020/04/12 ICU": icu_normalization,
     "2020/10/30 ICU": icu_normalization,
     "2021/01/16": new_hosp_normalization,
     "2021/02/02": new_hosp_normalization,
     "2021/02/08": new_hosp_normalization,
+    "2021/02/14": new_hosp_normalization,
     "2021/02/23": new_hosp_normalization,
     "2021/04/26": new_hosp_normalization,
     "2021/05/21": new_hosp_normalization,
@@ -190,7 +190,7 @@ normalizations = {
 
 endpoints = [
     "ICU",
-    "ICU",
+    "New hosp.",
     "New hosp.",
     "New hosp.",
     "New hosp.",
@@ -233,7 +233,7 @@ dates = [x.split()[0] for x in dates]
 
 public = [
     "No",
-    "No",
+    "Yes",
     "Yes",
     "Yes",
     "Yes",
