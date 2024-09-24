@@ -53,13 +53,12 @@ idf_icu_normalization = 2600 / 100
 metrics = {"MAE": mean_absolute_error, "ME": mean_difference, "Max Error": max_error}
 
 endpoints_normalizations = {
-    "ICU": 7000 / 100,
-    "idf_icu_normalization": 2600 / 100,
-    "New hosp.": 3040 / 100,
+    "ICU": 6937 / 100,
+    "New hosp.": 3036 / 100,
 }
 
 data_location = {
-    "2020/04/28 ICU": "data_preparation/output_data/min_med_max_and_error/ICU_error/2020_04_28_ICU_error.csv",
+    "2020/04/12 ICU": "data_preparation/output_data/min_med_max_and_error/ICU_error/2020_04_12_ICU_error.csv",
     "2020/10/30 ICU": "data_preparation/output_data/min_med_max_and_error/ICU_error/2020_10_30_ICU_error.csv",
     "2021/01/16": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_01_16_new_hosp_error.csv",
     "2021/02/02": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_02_02_new_hosp_error.csv",
@@ -78,7 +77,7 @@ data_location = {
 }
 
 normalizations = {
-    "2020/04/28 ICU": idf_icu_normalization,
+    "2020/04/12 ICU": icu_normalization,
     "2020/10/30 ICU": icu_normalization,
     "2021/01/16": new_hosp_normalization,
     "2021/02/02": new_hosp_normalization,
@@ -97,7 +96,7 @@ normalizations = {
 }
 
 increasing = {
-    "2020/04/28 ICU": False,
+    "2020/04/12 ICU": False,
     "2020/10/30 ICU": True,
     "2021/01/16": True,
     "2021/02/02": True,
@@ -152,7 +151,7 @@ with open(
 # ------------------------------------------------------------------------------------------------------
 
 data_location = {
-    "2020/04/28 ICU": "data_preparation/output_data/min_med_max_and_error/ICU_error/2020_04_28_ICU_error.csv",
+    "2020/04/12 ICU": "data_preparation/output_data/min_med_max_and_error/ICU_error/2020_04_12_ICU_error.csv",
     "2020/10/30 ICU": "data_preparation/output_data/min_med_max_and_error/ICU_error/2020_10_30_ICU_error.csv",
     "2021/01/16": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_01_16_new_hosp_error.csv",
     "2021/02/02": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_02_02_new_hosp_error.csv",
@@ -171,7 +170,7 @@ data_location = {
 }
 
 normalizations = {
-    "2020/04/28 ICU": idf_icu_normalization,
+    "2020/04/12 ICU": icu_normalization,
     "2020/10/30 ICU": icu_normalization,
     "2021/01/16": new_hosp_normalization,
     "2021/02/02": new_hosp_normalization,
@@ -216,7 +215,7 @@ results = evaluate_all_scenarios(
 )
 
 data_location_self_assessment = {
-    "2022/01/07": "data_preparation/source_data/improper_comparisons/improper_comparison_Jan_07_2022.csv",
+    "2022/01/07": "data_preparation/source_data/improper_comparisons/improper_comparison_Jan_07_2022_ICU.csv",
     "2021/02/02": "data_preparation/source_data/improper_comparisons/improper_comparison_Feb_02_2022.csv",
 }
 
