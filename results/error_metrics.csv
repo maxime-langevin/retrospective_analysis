@@ -1,7 +1,5 @@
 ﻿,Average uncertainty (beds),"MAE (median, beds)","MAE (low, beds)","MAE (high, beds)",Historical peak,MAE (median),MAE (optimist),MAE (pessimist),MAPE (median),MAPE (optimist),MAPE (pessimist),Increasing
 Scenario: 2020/10/30 ICU ICU,47.9,1327.7,560.9,3393.3,70.0,19.0,8.0,48.5,35.0,15.2,96.5,True
-Scenario: 2021/01/16 New hosp.,54.9,917.2,233.2,1767.1,30.4,30.2,7.7,58.1,72.7,18.1,144.0,True
-Scenario: 2021/02/02 New hosp.,37.2,840.6,303.0,1434.3,30.4,27.7,10.0,47.2,67.3,24.1,115.2,True
 Scenario: 2021/02/08 New hosp.,25.8,841.1,538.7,1323.8,30.4,27.7,17.7,43.5,67.6,42.8,108.0,True
 Scenario: 2021/02/14 New hosp.,35.4,792.7,328.0,1403.9,30.4,26.1,10.8,46.2,62.4,26.5,109.4,True
 Scenario: 2021/02/23 New hosp.,21.3,411.2,525.0,292.4,30.4,13.5,17.3,9.6,31.8,40.1,21.5,True

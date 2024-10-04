@@ -739,142 +739,6 @@ temp2 <- reality_new_hosp_adm %>%
 ```
 
 
-### January 16, 2021 {.tabset .tabset-fade .tabset-pills}
-
-Source: [EPIcx report 26](https://www.epicx-lab.com/uploads/9/6/9/4/9694133/inserm_covid-19-voc_dominance-20210116.pdf){target="_blank"}, January 16, 2021. Identified on EPIcx lab [webpage](https://www.epicx-lab.com/covid-19-pandemic-response.html){target="_blank"}.
-
-#### Reproduced
-
-```{r 2021_01_16}
-#careful, original data reported per week, have to transform it
-scenarios <- read_csv("source_data/2021_01_16/new_hosp_weekly.csv")
-scenarios$date <- paste0(scenarios$date, "-4") #add number 4 to date, fo "Wednesday"
-scenarios$date <- ISOweek2date(scenarios$date) #transform weeks numbers into dates
-
-#graph comparison
-f_graph(
-  temp2, scenarios, # reality and scenarios datasets
-  "new_hosp", # variable of interest
-  "2021-01-16", 1000, #publication date label
-  "2020-10-01", "2021-05-01", #date limits on x axis
-  NA, # y axis limits
-  "weekly hospital admissions", # y label
-  "reality in Paireau et al." # reality label
-)
-
-#prepare and save data
-temp <- f_prepare_to_save(scenarios, temp2, "new_hosp")
-temp <- temp %>% 
-  mutate(across(-c(date), function(x) x/7)) %>% #weekly hosp transformed in daily hosp
-  filter(date <= as.Date("2021-03-22")) #stop comparison before 3rd lockdown, on March 22nd
-
-#since only 1 point per week, we linearly extrapolate missing days
-temp <- left_join(
-  #add missing days by join
-  data_frame(date = seq(as.Date(min(temp$date)), max(temp$date), by="days")),
-  temp, 
-  by="date"
-  ) %>%
-  #linear extrapolation on missing values
-  mutate(across(-date, ~na.approx(.x, na.rm=F)))
-
-#save
-f_save_csv_files(temp, output_path, "2021_01_16_new_hosp.csv")
-```
-
-#### Error
-
-```{r}
-#compute error and min med max scenarios
-error <- f_compute_error("2020-10-01", "2021-05-01", temp, max_new_hosp)
-
-f_graph_error(
-  error,
-  "2021-01-16", 50 #publication date label
-  )
-
-f_save_csv_files(error, output_path_error, "2021_01_16_new_hosp_error.csv")
-```
-
-#### Original {.tabset .tabset-fade}
-
-##### Fig 1
-
-```{r 2021_01_16_original, echo=FALSE, out.width="100%"}
-knitr::include_graphics("source_data/2021_01_16/2021_01_16.png")
-```
-
-
-### February 2, 2021 {.tabset .tabset-fade .tabset-pills}
-
-Source: [EPIcx report 28](https://www.epicx-lab.com/uploads/9/6/9/4/9694133/inserm-covid-19-voc-lockdown-20210202.pdf){target="_blank"}, February 2, 2021. Identified on EPIcx lab [webpage](https://www.epicx-lab.com/covid-19-pandemic-response.html){target="_blank"}.
-
-#### Reproduced 
-
-```{r 2021_02_02_EPIcx}
-#careful, original data reported per week, have to transform it
-scenarios <- read_csv("source_data/2021_02_02/new_hosp_weekly.csv")
-scenarios$date <- paste0(scenarios$date, "-4") #add number 4 to date, fo "Wednesday"
-scenarios$date <- ISOweek2date(scenarios$date) #transform weeks numbers into dates
-
-#graph comparison
-f_graph(
-  temp2, scenarios, # reality and scenarios datasets
-  "new_hosp", # variable of interest
-  "2021-02-02", 1000, # publication date label
-  "2020-10-01", "2021-05-01", # date limits x axis
-  NA, # y axis limits
-  "weekly hospital admissions", # y label
-  "reality in Paireau et al." # reality label
-)
-
-#prepare to save data
-temp <- f_prepare_to_save(scenarios, temp2, "new_hosp")
-
-#date limits of comparison
-temp <- temp %>% mutate(across(-c(date), function(x) x/7)) %>% #weekly hosp transformed in daily hosp
-    filter(date <= as.Date("2021-03-22")) #stop comparison before 3rd lockdown, on March 22nd
-
-#since only 1 point per week, we linearly extrapolate missing days
-temp <- left_join(
-  #add missing days by join
-  data_frame(date = seq(as.Date(min(temp$date)), max(temp$date), by="days")),
-  temp, 
-  by="date"
-  ) %>%
-  #linear extrapolation on missing values
-  mutate(across(-date, ~na.approx(.x, na.rm=F)))
-
-#save
-f_save_csv_files(temp, output_path, "2021_02_02_new_hosp.csv")
-```
-
-
-#### Error
-
-```{r}
-error <- f_compute_error("2020-10-01", "2021-05-01", temp, max_new_hosp)
-
-f_graph_error(
-  error,
-  "2021-02-02", 50 #publication date label
-  )
-
-f_save_csv_files(error, output_path_error, "2021_02_02_new_hosp_error.csv")
-```
-
-#### Original {.tabset .tabset-fade}
-
-##### Fig 2
-
-```{r 2021_02_02_original, echo=FALSE, out.width="100%"}
-knitr::include_graphics("source_data/2021_02_02/2021_02_02.png")
-```
-
-
-
-
-
 ### February 8, 2021 {.tabset .tabset-fade .tabset-pills}
 
 Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/variant/RapportInstitutPasteur_variants_8fevrier2021.pdf){target="_blank"}, February 8, 2021. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/impact-variant/){target="_blank"}.
@@ -1484,7 +1348,7 @@ data_ICU_beds <- bind_rows(lapply(
 
 #combine all new scenarios hosp data for whole France
 data_new_hosp <- bind_rows(lapply(
-  c("2021_01_16", "2021_02_02", "2021_02_08", "2021_02_14", "2021_02_23", "2021_04_26", "2021_05_21", "2021_07_26", "2021_08_05", "2021_10_04", "2022_01_07"), 
+  c("2021_02_08", "2021_02_14", "2021_02_23", "2021_04_26", "2021_05_21", "2021_07_26", "2021_08_05", "2021_10_04", "2022_01_07"), 
   f_read_new_hosp
   ))
 
@@ -1692,8 +1556,6 @@ data_new_hosp <- data_new_hosp %>%
 data_new_hosp$report <- factor(
   data_new_hosp$report,
   levels = c(
-    "Jan 16, 2021",
-    "Feb 02, 2021", 
     "Feb 08, 2021", 
     "Feb 14, 2021",
     "Feb 23, 2021", 
@@ -1710,8 +1572,6 @@ data_new_hosp$report <- factor(
 report_dates_hosp$place[report_dates_hosp$place=="2021-07-26"] <- report_dates_hosp$place[report_dates_hosp$place=="2021-07-26"]-5
 report_dates_hosp$place[report_dates_hosp$place=="2021-08-05"] <- report_dates_hosp$place[report_dates_hosp$place=="2021-08-05"]+5
 #small offset to position winter 2021 reports
-report_dates_hosp$place[report_dates_hosp$place=="2021-01-16"] <- report_dates_hosp$place[report_dates_hosp$place=="2021-01-16"]-10
-report_dates_hosp$place[report_dates_hosp$place=="2021-02-02"] <- report_dates_hosp$place[report_dates_hosp$place=="2021-02-02"]-10
 report_dates_hosp$place[report_dates_hosp$place=="2021-02-08"] <- report_dates_hosp$place[report_dates_hosp$place=="2021-02-08"]-1
 report_dates_hosp$place[report_dates_hosp$place=="2021-02-14"] <- report_dates_hosp$place[report_dates_hosp$place=="2021-02-14"]+8
 report_dates_hosp$place[report_dates_hosp$place=="2021-02-23"] <- report_dates_hosp$place[report_dates_hosp$place=="2021-02-23"]+15
@@ -1927,7 +1787,7 @@ p2
 temp <- bind_rows(
   
   #Feb 2021, illegitimate
-  read_csv("source_data/improper_comparisons/improper_comparison_Feb_02_2022.csv") %>%
+  read_csv("source_data/improper_comparisons/improper_comparison_Feb_08_2021_ICU.csv") %>%
     #only 1 median scenario
     select(date, reality, value = med) %>%
     mutate(scenario_type = "median") %>%
@@ -2057,45 +1917,37 @@ f_graph_short_term_changes <-
     
     return(g)
   }
-
-g1 <- 
-  f_graph_short_term_changes(
-    c("Jan 16, 2021", "Feb 02, 2021", "Feb 14, 2021")
-    ) +
-  xlim(as.Date("2021-01-01"), as.Date("2021-03-25"))
   
-g2 <- 
+g1 <- 
   f_graph_short_term_changes(
     c("Feb 08, 2021", "Feb 23, 2021")
     ) +
   xlim(as.Date("2021-01-01"), as.Date("2021-03-25")) +
   ylim(0, 3100)
 
-g3 <- 
+g2 <- 
   f_graph_short_term_changes(
     c("Apr 26, 2021", "May 21, 2021")
     ) +
   xlim(as.Date("2021-04-01"), as.Date("2021-06-15")) +
   ylim(0, 2000) 
 
-g4 <- 
+g3 <- 
   f_graph_short_term_changes(
     c("Jul 26, 2021", "Aug 05, 2021")
     ) +
   xlim(as.Date("2021-07-15"), as.Date("2021-10-01"))
 
 
-g1 + 
-  g3 + theme(axis.title.y = element_blank()) +
-  g2 + 
-  g4 + theme(axis.title.y = element_blank()) + 
-  plot_layout(nrow = 2, guides = "collect") +
+ 
+g1 + g2 + g3 + 
+  plot_layout(ncol = 1, guides = "collect") +
   plot_annotation(tag_levels = 'a', subtitle = "vertical line: publication date") 
 
 #save
 f_save_graph_pdf_png(
   "../graphs/raw_comparisons/short_term_changes",
-  8, 5, dpi_resolution
+  5, 6, dpi_resolution
 )
 ```
 
@@ -2179,6 +2031,192 @@ f_save_graph_pdf_png(
   2.5, 2.5, dpi_resolution
 )
 ```
+
+
+
+
+
+# Debatable Winter 2021 scenarios
+
+
+
+
+<!-- ```{r output_path_for_corrected_hospital_scenarios} -->
+<!-- # where prepared new hosp data is saved -->
+<!-- output_path <- "output_data/extracted_data/new_hosp_scenarios/" -->
+<!-- output_path_error <- "output_data/min_med_max_and_error/new_hosp_error/" -->
+<!-- ``` -->
+
+<!-- ```{r reality_new_hosp_daily_to_weekly} -->
+<!-- #some scenarios report data on weekly and not daily basis -->
+<!-- #for reality dataset, transform daily data to weekly data, to compare to scenarios -->
+<!-- temp2 <- reality_new_hosp_adm %>% -->
+<!--   select(date,new_hosp) %>% -->
+<!--   mutate( -->
+<!--     date = ISOweek(date), -->
+<!--     date = ISOweek2date(paste0(date, "-4")) -->
+<!--     ) %>% -->
+<!--   group_by(date) %>% -->
+<!--   summarise(new_hosp = sum(new_hosp, na.rm=T))  -->
+<!-- ``` -->
+
+
+<!-- ### January 16, 2021 {.tabset .tabset-fade .tabset-pills} -->
+
+<!-- Source: [EPIcx report 26](https://www.epicx-lab.com/uploads/9/6/9/4/9694133/inserm_covid-19-voc_dominance-20210116.pdf){target="_blank"}, January 16, 2021. Identified on EPIcx lab [webpage](https://www.epicx-lab.com/covid-19-pandemic-response.html){target="_blank"}. -->
+
+<!-- #### Reproduced -->
+
+<!-- ```{r 2021_01_16} -->
+<!-- #careful, original data reported per week, have to transform it -->
+<!-- scenarios <- read_csv("source_data/2021_01_16/new_hosp_weekly.csv") -->
+<!-- scenarios$date <- paste0(scenarios$date, "-4") #add number 4 to date, fo "Wednesday" -->
+<!-- scenarios$date <- ISOweek2date(scenarios$date) #transform weeks numbers into dates -->
+
+<!-- #graph comparison -->
+<!-- f_graph( -->
+<!--   temp2, scenarios, # reality and scenarios datasets -->
+<!--   "new_hosp", # variable of interest -->
+<!--   "2021-01-16", 1000, #publication date label -->
+<!--   "2020-10-01", "2021-05-01", #date limits on x axis -->
+<!--   NA, # y axis limits -->
+<!--   "weekly hospital admissions", # y label -->
+<!--   "reality in Paireau et al." # reality label -->
+<!-- ) -->
+
+<!-- #prepare and save data -->
+<!-- temp <- f_prepare_to_save(scenarios, temp2, "new_hosp") -->
+<!-- temp <- temp %>%  -->
+<!--   mutate(across(-c(date), function(x) x/7)) %>% #weekly hosp transformed in daily hosp -->
+<!--   filter(date <= as.Date("2021-03-22")) #stop comparison before 3rd lockdown, on March 22nd -->
+
+<!-- #since only 1 point per week, we linearly extrapolate missing days -->
+<!-- temp <- left_join( -->
+<!--   #add missing days by join -->
+<!--   data_frame(date = seq(as.Date(min(temp$date)), max(temp$date), by="days")), -->
+<!--   temp,  -->
+<!--   by="date" -->
+<!--   ) %>% -->
+<!--   #linear extrapolation on missing values -->
+<!--   mutate(across(-date, ~na.approx(.x, na.rm=F))) -->
+
+<!-- #save -->
+<!-- f_save_csv_files(temp, output_path, "2021_01_16_new_hosp.csv") -->
+<!-- ``` -->
+
+<!-- #### Error -->
+
+<!-- ```{r} -->
+<!-- #compute error and min med max scenarios -->
+<!-- error <- f_compute_error("2020-10-01", "2021-05-01", temp, max_new_hosp) -->
+
+<!-- f_graph_error( -->
+<!--   error, -->
+<!--   "2021-01-16", 50 #publication date label -->
+<!--   ) -->
+
+<!-- f_save_csv_files(error, output_path_error, "2021_01_16_new_hosp_error.csv") -->
+<!-- ``` -->
+
+<!-- #### Original {.tabset .tabset-fade} -->
+
+<!-- ##### Fig 1 -->
+
+<!-- ```{r 2021_01_16_original, echo=FALSE, out.width="100%"} -->
+<!-- knitr::include_graphics("source_data/2021_01_16/2021_01_16.png") -->
+<!-- ``` -->
+
+
+<!-- ### February 2, 2021 {.tabset .tabset-fade .tabset-pills} -->
+
+<!-- Source: [EPIcx report 28](https://www.epicx-lab.com/uploads/9/6/9/4/9694133/inserm-covid-19-voc-lockdown-20210202.pdf){target="_blank"}, February 2, 2021. Identified on EPIcx lab [webpage](https://www.epicx-lab.com/covid-19-pandemic-response.html){target="_blank"}. -->
+
+<!-- #### Reproduced  -->
+
+<!-- ```{r 2021_02_02_EPIcx} -->
+<!-- #careful, original data reported per week, have to transform it -->
+<!-- scenarios <- read_csv("source_data/2021_02_02/new_hosp_weekly.csv") -->
+<!-- scenarios$date <- paste0(scenarios$date, "-4") #add number 4 to date, fo "Wednesday" -->
+<!-- scenarios$date <- ISOweek2date(scenarios$date) #transform weeks numbers into dates -->
+
+<!-- #graph comparison -->
+<!-- f_graph( -->
+<!--   temp2, scenarios, # reality and scenarios datasets -->
+<!--   "new_hosp", # variable of interest -->
+<!--   "2021-02-02", 1000, # publication date label -->
+<!--   "2020-10-01", "2021-05-01", # date limits x axis -->
+<!--   NA, # y axis limits -->
+<!--   "weekly hospital admissions", # y label -->
+<!--   "reality in Paireau et al." # reality label -->
+<!-- ) -->
+
+<!-- #prepare to save data -->
+<!-- temp <- f_prepare_to_save(scenarios, temp2, "new_hosp") -->
+
+<!-- #date limits of comparison -->
+<!-- temp <- temp %>% mutate(across(-c(date), function(x) x/7)) %>% #weekly hosp transformed in daily hosp -->
+<!--     filter(date <= as.Date("2021-03-22")) #stop comparison before 3rd lockdown, on March 22nd -->
+
+<!-- #since only 1 point per week, we linearly extrapolate missing days -->
+<!-- temp <- left_join( -->
+<!--   #add missing days by join -->
+<!--   data_frame(date = seq(as.Date(min(temp$date)), max(temp$date), by="days")), -->
+<!--   temp,  -->
+<!--   by="date" -->
+<!--   ) %>% -->
+<!--   #linear extrapolation on missing values -->
+<!--   mutate(across(-date, ~na.approx(.x, na.rm=F))) -->
+
+<!-- #save -->
+<!-- f_save_csv_files(temp, output_path, "2021_02_02_new_hosp.csv") -->
+<!-- ``` -->
+
+
+<!-- #### Error -->
+
+<!-- ```{r} -->
+<!-- error <- f_compute_error("2020-10-01", "2021-05-01", temp, max_new_hosp) -->
+
+<!-- f_graph_error( -->
+<!--   error, -->
+<!--   "2021-02-02", 50 #publication date label -->
+<!--   ) -->
+
+<!-- f_save_csv_files(error, output_path_error, "2021_02_02_new_hosp_error.csv") -->
+<!-- ``` -->
+
+<!-- #### Original {.tabset .tabset-fade} -->
+
+<!-- ##### Fig 2 -->
+
+<!-- ```{r 2021_02_02_original, echo=FALSE, out.width="100%"} -->
+<!-- knitr::include_graphics("source_data/2021_02_02/2021_02_02.png") -->
+<!-- ``` -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -59,8 +59,6 @@ endpoints_normalizations = {
 
 data_location = {
     "2020/10/30 ICU": "data_preparation/output_data/min_med_max_and_error/ICU_error/2020_10_30_ICU_error.csv",
-    "2021/01/16": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_01_16_new_hosp_error.csv",
-    "2021/02/02": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_02_02_new_hosp_error.csv",
     "2021/02/08": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_02_08_new_hosp_error.csv",
     "2021/02/14": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_02_14_new_hosp_error.csv",
     "2021/02/23": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_02_23_new_hosp_error.csv",
@@ -78,8 +76,6 @@ data_location = {
 
 normalizations = {
     "2020/10/30 ICU": icu_normalization,
-    "2021/01/16": new_hosp_normalization,
-    "2021/02/02": new_hosp_normalization,
     "2021/02/08": new_hosp_normalization,
     "2021/02/14": new_hosp_normalization,
     "2021/02/23": new_hosp_normalization,
@@ -97,8 +93,6 @@ normalizations = {
 
 increasing = {
     "2020/10/30 ICU": True,
-    "2021/01/16": True,
-    "2021/02/02": True,
     "2021/02/14": True,
     "2021/02/08": True,
     "2021/02/23": True,
@@ -116,8 +110,6 @@ increasing = {
 
 scenario_endpoints = [
     "ICU",
-    "New hosp.",
-    "New hosp.",
     "New hosp.",
     "New hosp.",
     "New hosp.",
@@ -150,80 +142,17 @@ with open(
 
 # ------------------------------------------------------------------------------------------------------
 
-data_location = {
-    "2020/10/30 ICU": "data_preparation/output_data/min_med_max_and_error/ICU_error/2020_10_30_ICU_error.csv",
-    "2021/01/16": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_01_16_new_hosp_error.csv",
-    "2021/02/02": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_02_02_new_hosp_error.csv",
-    "2021/02/08": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_02_08_new_hosp_error.csv",
-    "2021/02/14": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_02_14_new_hosp_error.csv",
-    "2021/02/23": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_02_23_new_hosp_error.csv",
-    "2021/04/26": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_04_26_new_hosp_error.csv",
-    "2021/05/21": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_05_21_new_hosp_error.csv",
-    "2021/05/21 ICU": "data_preparation/output_data/min_med_max_and_error/ICU_error/2021_05_21_ICU_error.csv",
-    "2021/07/26 ICU": "data_preparation/output_data/min_med_max_and_error/ICU_error/2021_07_26_ICU_error.csv",
-    "2021/07/26": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_07_26_new_hosp_error.csv",
-    "2021/08/05": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_08_05_new_hosp_error.csv",
-    "2021/08/05 ICU": "data_preparation/output_data/min_med_max_and_error/ICU_error/2021_08_05_ICU_error.csv",
-    "2021/10/04": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2021_10_04_new_hosp_error.csv",
-    "2022/01/07": "data_preparation/output_data/min_med_max_and_error/new_hosp_error/2022_01_07_new_hosp_error.csv",
-    "2022/01/07 ICU": "data_preparation/output_data/min_med_max_and_error/ICU_error/2022_01_07_ICU_error.csv",
-}
-
-normalizations = {
-    "2020/10/30 ICU": icu_normalization,
-    "2021/01/16": new_hosp_normalization,
-    "2021/02/02": new_hosp_normalization,
-    "2021/02/08": new_hosp_normalization,
-    "2021/02/14": new_hosp_normalization,
-    "2021/02/23": new_hosp_normalization,
-    "2021/04/26": new_hosp_normalization,
-    "2021/05/21": new_hosp_normalization,
-    "2021/05/21 ICU": icu_normalization,
-    "2021/07/26 ICU": icu_normalization,
-    "2021/07/26": new_hosp_normalization,
-    "2021/08/05": new_hosp_normalization,
-    "2021/08/05 ICU": icu_normalization,
-    "2021/10/04": new_hosp_normalization,
-    "2022/01/07": new_hosp_normalization,
-    "2022/01/07 ICU": icu_normalization,
-}
-
-endpoints = [
-    "ICU",
-    "New hosp.",
-    "New hosp.",
-    "New hosp.",
-    "New hosp.",
-    "New hosp.",
-    "New hosp.",
-    "New hosp.",
-    "ICU",
-    "ICU",
-    "New hosp.",
-    "New hosp.",
-    "ICU",
-    "New hosp.",
-    "New hosp.",
-    "ICU",
-    "ICU",
-    "ICU",
-]
-
-
-results = evaluate_all_scenarios(
-    data_location, metrics=metrics, normalizations=normalizations, increasing=increasing
-)
 
 data_location_self_assessment = {
     "2022/01/07": "data_preparation/source_data/improper_comparisons/improper_comparison_Jan_07_2022_ICU.csv",
-    "2021/02/02": "data_preparation/source_data/improper_comparisons/improper_comparison_Feb_02_2022.csv",
+    "2021/02/08": "data_preparation/source_data/improper_comparisons/improper_comparison_Feb_08_2021_ICU.csv",
 }
 
 results_self_assessment = evaluate_all_scenarios(
     data_location_self_assessment,
     metrics=metrics,
-    normalizations={"2022/01/07": 70.0, "2021/02/02": 70.0},
-    increasing={"2022/01/07": True, "2021/02/02": False},
+    normalizations={"2022/01/07": icu_normalization, "2021/02/08": icu_normalization},
+    increasing={"2022/01/07": True, "2021/02/08": False},
 )
 
 
@@ -247,10 +176,7 @@ public = [
     "Yes",
     "Yes",
     "Yes",
-    "Yes",
-    "Yes",
-    "Yes",
-    "Yes",
+    "Yes"
 ]
 legitimate_comparisons = [
     "Yes",
@@ -265,17 +191,33 @@ legitimate_comparisons = [
     "Yes",
     "Yes",
     "Yes",
-    "Yes",
-    "Yes",
-    "Yes",
-    "Yes",
     "No",
     "No",
     "No",
+    "No"
+]
+
+endpoints = [
+    "ICU",
+    "New hosp.",
+    "New hosp.",
+    "New hosp.",
+    "New hosp.",
+    "New hosp.",
+    "ICU",
+    "ICU",
+    "New hosp.",
+    "New hosp.",
+    "ICU",
+    "New hosp.",
+    "New hosp.",
+    "ICU",
+    "ICU",
+    "ICU"
 ]
 
 
-dates.extend(["2022/01/07", "2021/02/02"])
+dates.extend(["2022/01/07", "2021/02/08"])
 additional_information_df = pd.DataFrame(
     zip(dates, endpoints, public, legitimate_comparisons),
     columns=["Date", "Endpoint", "Public", "Valid assessment"],
@@ -286,8 +228,6 @@ additional_information_df["Self-assessment by modelers"] = [
     "No",
     "No",
     "No",
-    "No",
-    "No",
     "Yes",
     "Yes",
     "No",
@@ -296,9 +236,9 @@ additional_information_df["Self-assessment by modelers"] = [
     "No",
     "No",
     "No",
-    "No",
     "Yes",
     "Yes",
+    "Yes"
 ]
 
 additional_information_df.index = full_results.index

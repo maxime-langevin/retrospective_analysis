@@ -64,6 +64,9 @@ max_new_hosp_IDF <- 1210
 max_ICU_beds_IDF <- 2852 #historical peak of ICU beds in ile de france region (for Apr 2020 scenario)
 dpi_resolution <- 500 #default dpi resolution for our png graphs
 
+#set seed for reproducibility of graphs with small random offset of points to avoid overplotting
+set.seed(123)
+
 # Get the directory of the R Markdown file and set the working directory to the file location
 md_dir <- dirname(rstudioapi::getActiveDocumentContext()$path)
 setwd(md_dir)
@@ -144,22 +147,6 @@ temporal <- read_csv('results/error_metrics_stratified_by_dates.csv') %>%
       Period == "" ~ ""
     )
   )
-```
-
-For April 2020 scenarios which only concern Ile-de-France region, the absolute errors and uncertainty expressed in number of beds are not directly comparable to the national figure. To account of this, in that particular case, we apply a proportional factor to account for the fact that number of beds is lower than at the national scale. This proportional factor is the ratio between the historical epidemic peak at the national scale and the one at the regional Ile-de-France scale, or a `r round(max_ICU_beds/max_ICU_beds_IDF, 1)` factor.
-
-```{r correct_IDF_data}
-temporal$`Average uncertainty (beds)`[temporal$scenario_ID=="2020-04-28"] <- 
-  temporal$`Average uncertainty (beds)`[temporal$scenario_ID=="2020-04-28"]*max_ICU_beds/max_ICU_beds_IDF
-
-temporal$`MAE (low, beds)`[temporal$scenario_ID=="2020-04-28"] <- 
-  temporal$`MAE (low, beds)`[temporal$scenario_ID=="2020-04-28"]*max_ICU_beds/max_ICU_beds_IDF
-
-temporal$`MAE (median, beds)`[temporal$scenario_ID=="2020-04-28"] <- 
-  temporal$`MAE (median, beds)`[temporal$scenario_ID=="2020-04-28"]*max_ICU_beds/max_ICU_beds_IDF
-
-temporal$`MAE (high, beds)`[temporal$scenario_ID=="2020-04-28"] <- 
-  temporal$`MAE (high, beds)`[temporal$scenario_ID=="2020-04-28"]*max_ICU_beds/max_ICU_beds_IDF
 ```
 
 ```{r function_save_pdf_ong}
@@ -281,7 +268,7 @@ rm(temp, hline_dat, label_dat)
 
 ## Error Bias (Mean Error) {.tabset .tabset-fade}
 
-When a report has scenarios relateing to both ICU and new hospitalizations, we take the mean of the 2.
+When a report has scenarios relating to both ICU and new hospitalizations, we take the mean of the 2.
 
 ```{r bias_mean_error}
 temp <- errors %>%
@@ -364,11 +351,10 @@ reports_date$positions[reports_date$labels=="2021/08/05"] <- reports_date$positi
 #Apr and May 2021
 reports_date$positions[reports_date$labels=="2021-04-26"] <- reports_date$positions[reports_date$labels=="2021-04-26"] -5
 reports_date$positions[reports_date$labels=="2021-05-21"] <- reports_date$positions[reports_date$labels=="2021-05-21"] +5
-#Jan and Feb 2021
-reports_date$positions[reports_date$labels=="2021-01-16"] <- reports_date$positions[reports_date$labels=="2021-01-16"] -20
-reports_date$positions[reports_date$labels=="2021-02-02"] <- reports_date$positions[reports_date$labels=="2021-02-02"] -10
-reports_date$positions[reports_date$labels=="2021-02-08"] <- reports_date$positions[reports_date$labels=="2021-02-08"] +5
-reports_date$positions[reports_date$labels=="2021-02-23"] <- reports_date$positions[reports_date$labels=="2021-02-23"] +15
+#Feb 2021
+reports_date$positions[reports_date$labels=="2021-02-08"] <- reports_date$positions[reports_date$labels=="2021-02-08"] -8
+reports_date$positions[reports_date$labels=="2021-02-14"] <- reports_date$positions[reports_date$labels=="2021-02-14"]+1
+reports_date$positions[reports_date$labels=="2021-02-23"] <- reports_date$positions[reports_date$labels=="2021-02-23"] +8
 ```
 
 ```{r function_for_graph_self_assessement_bias}
@@ -433,13 +419,13 @@ g_self_assessment_bias <- function(
       labels = format(reports_date$labels, format="%b %d, %Y")
     ) +
     coord_cartesian(
-      xlim = c(as.Date("2020-04-20"), as.Date("2022-05-01")),
+      xlim = c(as.Date("2020-10-01"), as.Date("2022-05-01")),
       ylim = c(0, y_lim)
       ) +
     theme(
       axis.text.x = element_text(angle = 45, vjust = 1, hjust=1),
       axis.ticks.x=element_blank(),
-      legend.position = c(.2, .7),
+      legend.position = c(.2, .75),
       legend.background = element_rect(fill=alpha('white', .7), color="grey")
       ) +
     labs(
@@ -510,23 +496,6 @@ temp <- temp %>%
   
 ```
 
-### MAE
-
-```{r self_assessment_bias_vs_MAE}
-g <- insert_yaxis_grob(
-  g_self_assessment_bias(temp, "Mean Absolute Error (%)", .05, 0.7, 1)[[1]] +
-    labs(y="Mean Absolute Error\n(% of historical peak)"), 
-  g_self_assessment_bias(temp, "Mean Absolute Error (%)", .05, 0.7, 1)[[2]], 
-  grid::unit(.1, "null"), position = "right"
-  )
-(ggdraw(g))
-
-f_save_graph_pdf_png(
-  "graphs/errors_and_uncertainties/self_assessment_bias_MAE",
-  6, 4, 500
-)
-rm(g)
-```
 
 ### MAPE
 
@@ -543,6 +512,25 @@ f_save_graph_pdf_png(
   "graphs/errors_and_uncertainties/self_assessment_bias_MAPE",
   6, 4, 500
 )
+```
+
+
+### MAE
+
+```{r self_assessment_bias_vs_MAE}
+g <- insert_yaxis_grob(
+  g_self_assessment_bias(temp, "Mean Absolute Error (%)", .05, 0.7, 1)[[1]] +
+    labs(y="Mean Absolute Error\n(% of historical peak)"), 
+  g_self_assessment_bias(temp, "Mean Absolute Error (%)", .05, 0.7, 1)[[2]], 
+  grid::unit(.1, "null"), position = "right"
+  )
+(ggdraw(g))
+
+f_save_graph_pdf_png(
+  "graphs/errors_and_uncertainties/self_assessment_bias_MAE",
+  6, 4, 500
+)
+rm(g)
 ```
 
 ## Both graphs
