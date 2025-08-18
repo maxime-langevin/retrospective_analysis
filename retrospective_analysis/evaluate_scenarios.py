@@ -8,25 +8,31 @@ idf_icu_normalization = 2600 / 100
 
 
 def compute_metrics(df, metrics, scenario_name="low", normalization=1, increasing=True):
+    # This helper function remains unchanged as it is already generic.
     results = {}
     for i, (metric_name, metric) in enumerate(metrics.items()):
-        # dubious if non linear function?
-        # multiply by 100 to express as % of normalization
-        results["Scenario_{}: {}".format(scenario_name, metric_name)] = metric(
-            df["reality"] / normalization, df[scenario_name] / normalization
-        )
+        # NaNs should be handled before calling this function
+        clean_df = df[['reality', scenario_name]].dropna()
+        if not clean_df.empty:
+            results["Scenario_{}: {}".format(scenario_name, metric_name)] = metric(
+                clean_df["reality"] / normalization, clean_df[scenario_name] / normalization
+            )
+        else:
+            results["Scenario_{}: {}".format(scenario_name, metric_name)] = np.nan
+
     results["Scenario_{}: {}".format(scenario_name, "Increasing")] = increasing
     return results
 
 
 def evaluate_all_scenarios(urls, metrics, normalizations, increasing):
     results = {}
-    column_names = list(metrics.keys())
     column_names = [
         "Average uncertainty (beds)",
         "MAE (median, beds)",
         "MAE (low, beds)",
         "MAE (high, beds)",
+        "MAE (constant, beds)",
+        "MAE (damped_trend, beds)",
         "Historical peak",
         "MAE (median)",
         "MAE (optimist)",
@@ -34,50 +40,69 @@ def evaluate_all_scenarios(urls, metrics, normalizations, increasing):
         "MAPE (median)",
         "MAPE (optimist)",
         "MAPE (pessimist)",
+        "MAPE (constant)",
+        "MAPE (damped_trend)",
         "Increasing",
     ]
+    
     for i, (scenario, url) in enumerate(urls.items()):
         normalization = normalizations[scenario]
         if normalization == icu_normalization or normalization == idf_icu_normalization:
             scenario_type = "ICU"
         else:
             scenario_type = "New hosp."
+        
         df = load_dataframe(url, start_date=scenario.split()[0].replace("/", "-"))
         df = df.apply(pd.to_numeric)
         dict_results = {}
 
-        dict_results["Average uncertainty (beds)"] = np.mean(
-            df["max"] / normalization - df["min"] / normalization
-        )
-        dict_results["MAE (median, beds)"] = mean_absolute_error(
-            df["reality"], df["med"]
-        )
-        dict_results["MAE (low, beds)"] = mean_absolute_error(df["reality"], df["min"])
-        dict_results["MAE (high, beds)"] = mean_absolute_error(df["reality"], df["max"])
+        # --- Calculate metrics robustly by dropping NaNs ---
+        # Median
+        clean_df_med = df[['reality', 'med']].dropna()
+        dict_results["MAE (median, beds)"] = mean_absolute_error(clean_df_med["reality"], clean_df_med["med"])
+        dict_results["MAPE (median)"] = 100 * mean_absolute_percentage_error(clean_df_med["reality"], clean_df_med["med"])
+        dict_results["MAE (median)"] = mean_absolute_error(df["reality"] / normalization, df["med"] / normalization)
+        
+        # Low (Optimist)
+        clean_df_low = df[['reality', 'min']].dropna()
+        dict_results["MAE (low, beds)"] = mean_absolute_error(clean_df_low["reality"], clean_df_low["min"])
+        dict_results["MAPE (optimist)"] = 100 * mean_absolute_percentage_error(clean_df_low["reality"], clean_df_low["min"])
+        dict_results["MAE (optimist)"] = mean_absolute_error(df["reality"] / normalization, df["min"] / normalization)
+
+        # High (Pessimist)
+        clean_df_high = df[['reality', 'max']].dropna()
+        dict_results["MAE (high, beds)"] = mean_absolute_error(clean_df_high["reality"], clean_df_high["max"])
+        dict_results["MAPE (pessimist)"] = 100 * mean_absolute_percentage_error(clean_df_high["reality"], clean_df_high["max"])
+        dict_results["MAE (pessimist)"] = mean_absolute_error(df["reality"] / normalization, df["max"] / normalization)
+        
+        # Constant Baseline
+        if 'constant_baseline' in df.columns:
+            clean_df_const = df[['reality', 'constant_baseline']].dropna()
+            if not clean_df_const.empty:
+                dict_results["MAE (constant, beds)"] = mean_absolute_error(clean_df_const["reality"], clean_df_const["constant_baseline"])
+                dict_results["MAPE (constant)"] = 100 * mean_absolute_percentage_error(clean_df_const["reality"], clean_df_const["constant_baseline"])
+            else:
+                dict_results["MAE (constant, beds)"] = np.nan
+                dict_results["MAPE (constant)"] = np.nan
+        
+        # Damped Trend Baseline
+        if 'damped_trend_baseline' in df.columns:
+            clean_df_damped = df[['reality', 'damped_trend_baseline']].dropna()
+            if not clean_df_damped.empty:
+                dict_results["MAE (damped_trend, beds)"] = mean_absolute_error(clean_df_damped["reality"], clean_df_damped["damped_trend_baseline"])
+                dict_results["MAPE (damped_trend)"] = 100 * mean_absolute_percentage_error(clean_df_damped["reality"], clean_df_damped["damped_trend_baseline"])
+            else:
+                dict_results["MAE (damped_trend, beds)"] = np.nan
+                dict_results["MAPE (damped_trend)"] = np.nan
+
+        dict_results["Average uncertainty (beds)"] = np.mean(df["max"] - df["min"])
         dict_results["Historical peak"] = normalization
-        dict_results["MAE (median)"] = mean_absolute_error(
-            df["reality"] / normalization, df["med"] / normalization
-        )
-        dict_results["MAE (optimist)"] = mean_absolute_error(
-            df["reality"] / normalization, df["min"] / normalization
-        )
-        dict_results["MAE (pessimist)"] = mean_absolute_error(
-            df["reality"] / normalization, df["max"] / normalization
-        )
-        dict_results["MAPE (median)"] = 100 * mean_absolute_percentage_error(
-            df["reality"], df["med"]
-        )
-        dict_results["MAPE (optimist)"] = 100 * mean_absolute_percentage_error(
-            df["reality"], df["min"]
-        )
-        dict_results["MAPE (pessimist)"] = 100 * mean_absolute_percentage_error(
-            df["reality"], df["max"]
-        )
         dict_results["Increasing"] = increasing[scenario]
-        results[f"Scenario: {scenario} {scenario_type}"] = list(dict_results.values())
-    return pd.DataFrame.from_dict(results, orient="index", columns=column_names).round(
-        1
-    )
+        
+        row = [dict_results.get(col, np.nan) for col in column_names]
+        results[f"Scenario: {scenario} {scenario_type}"] = row
+
+    return pd.DataFrame.from_dict(results, orient="index", columns=column_names).round(1)
 
 
 def compute_metrics_all_scenarios(
@@ -92,163 +117,110 @@ def compute_metrics_all_scenarios(
     results = {}
     column_names = list(metrics.keys()) + ["Increasing"] + ["MAPE"]
 
-    """
-  if n_days:
-    column_names = [x + ' : {} scenario {} days'.format(scenario_name, n_days) for x in column_names]
-  else:
-    column_names = [x + ' : {} scenario'.format(scenario_name) for x in column_names]
-  """
-
     for i, (scenario, url) in enumerate(urls.items()):
         normalization = normalizations[scenario]
         if normalization == icu_normalization or normalization == idf_icu_normalization:
             scenario_type = "ICU"
         else:
             scenario_type = "New hosp."
+        
         df = load_dataframe(url, start_date=scenario.split()[0].replace("/", "-"))
         df = df.apply(pd.to_numeric)
+        
+        df_to_eval = df
         if n_days:
-            dict_results = compute_metrics(
-                df.head(n_days),
-                metrics=metrics,
-                scenario_name=scenario_name,
-                normalization=normalization,
-                increasing=increasing,
+            df_to_eval = df.head(n_days)
+            
+        dict_results = compute_metrics(
+            df_to_eval,
+            metrics=metrics,
+            scenario_name=scenario_name,
+            normalization=normalization,
+            increasing=increasing[scenario],
+        )
+        
+        clean_df_mape = df_to_eval[['reality', scenario_name]].dropna()
+        if not clean_df_mape.empty:
+            dict_results["Scenario_{}: {}".format(scenario_name, "MAPE")] = 100 * mean_absolute_percentage_error(
+                clean_df_mape["reality"], clean_df_mape[scenario_name]
             )
-            dict_results[
-                "Scenario_{}: {}".format(scenario_name, "MAPE")
-            ] = 100 * mean_absolute_percentage_error(df["reality"], df[scenario_name])
         else:
-            dict_results = compute_metrics(
-                df,
-                metrics=metrics,
-                scenario_name=scenario_name,
-                normalization=normalization,
-                increasing=increasing,
-            )
-            dict_results[
-                "Scenario_{}: {}".format(scenario_name, "MAPE")
-            ] = 100 * mean_absolute_percentage_error(df["reality"], df[scenario_name])
+            dict_results["Scenario_{}: {}".format(scenario_name, "MAPE")] = np.nan
 
         results[f"Scenario: {scenario} {scenario_type}"] = list(dict_results.values())
-    return pd.DataFrame.from_dict(results, orient="index", columns=column_names).round(
-        1
-    )
+        
+    return pd.DataFrame.from_dict(results, orient="index", columns=column_names).round(1)
 
 
 def evaluate_all_scenarios_with_dates(
     urls, metrics, normalizations, increasing, bins_length=14
 ):
     results = {}
-    column_names = list(metrics.keys())
     column_names = [
-        "Scenario",
-        "Scenario type",
+        "Scenario", "Scenario type", "Period",
         "Average uncertainty (beds)",
-        "MAE (median, beds)",
-        "MAE (low, beds)",
-        "MAE (high, beds)",
-        "Historical peak",
-        "MAE (median)",
-        "MAE (optimist)",
-        "MAE (pessimist)",
-        "MAPE (median)",
-        "MAPE (optimist)",
-        "MAPE (pessimist)",
-        "Increasing",
-        "Period",
+        "MAE (median, beds)", "MAE (low, beds)", "MAE (high, beds)",
+        "MAE (constant, beds)", "MAE (damped_trend, beds)",
+        "MAPE (median)", "MAPE (optimist)", "MAPE (pessimist)",
+        "MAPE (constant)", "MAPE (damped_trend)",
+        "Increasing"
     ]
+    
     for i, (scenario, url) in enumerate(urls.items()):
         normalization = normalizations[scenario]
         if normalization == icu_normalization or normalization == idf_icu_normalization:
             scenario_type = "ICU"
         else:
             scenario_type = "New hosp."
-        normalization = 1
+            
         df = load_dataframe(url, start_date=scenario.split()[0].replace("/", "-"))
         df = df.apply(pd.to_numeric)
-        dict_results = {}
+        
         for i in range(int(len(df) / bins_length)):
+            dict_results = {}
+            df_slice = df.iloc[i * bins_length : min((i + 1) * bins_length, len(df))]
+
             dict_results["Scenario"] = scenario
             dict_results["Scenario type"] = scenario_type
-            dict_results["Average uncertainty (beds)"] = np.mean(
-                df["max"].values[i * bins_length : min((i + 1) * bins_length, len(df))]
-                - df["min"].values[
-                    i * bins_length : min((i + 1) * bins_length, len(df))
-                ]
-                / normalization
-            )
-            dict_results["MAE (median, beds)"] = mean_absolute_error(
-                df["reality"].values[
-                    i * bins_length : min((i + 1) * bins_length, len(df))
-                ],
-                df["med"].values[i * bins_length : min((i + 1) * bins_length, len(df))],
-            )
-            dict_results["MAE (low, beds)"] = mean_absolute_error(
-                df["reality"].values[
-                    i * bins_length : min((i + 1) * bins_length, len(df))
-                ],
-                df["min"].values[i * bins_length : min((i + 1) * bins_length, len(df))],
-            )
-            dict_results["MAE (high, beds)"] = mean_absolute_error(
-                df["reality"].values[
-                    i * bins_length : min((i + 1) * bins_length, len(df))
-                ],
-                df["max"].values[i * bins_length : min((i + 1) * bins_length, len(df))],
-            )
-            dict_results["Historical peak"] = normalization
-            dict_results["MAE (median)"] = mean_absolute_error(
-                df["reality"].values[
-                    i * bins_length : min((i + 1) * bins_length, len(df))
-                ]
-                / normalization,
-                df["med"].values[i * bins_length : min((i + 1) * bins_length, len(df))]
-                / normalization,
-            )
-            dict_results["MAE (low)"] = mean_absolute_error(
-                df["reality"].values[
-                    i * bins_length : min((i + 1) * bins_length, len(df))
-                ]
-                / normalization,
-                df["min"].values[i * bins_length : min((i + 1) * bins_length, len(df))]
-                / normalization,
-            )
-            dict_results["MAE (high)"] = mean_absolute_error(
-                df["reality"].values[
-                    i * bins_length : min((i + 1) * bins_length, len(df))
-                ]
-                / normalization,
-                df["max"].values[i * bins_length : min((i + 1) * bins_length, len(df))]
-                / normalization,
-            )
-
-            dict_results["MAPE (median)"] = mean_absolute_error(
-                df["reality"].values[
-                    i * bins_length : min((i + 1) * bins_length, len(df))
-                ],
-                df["med"].values[i * bins_length : min((i + 1) * bins_length, len(df))],
-            )
-            dict_results["MAPE (low)"] = mean_absolute_error(
-                df["reality"].values[
-                    i * bins_length : min((i + 1) * bins_length, len(df))
-                ],
-                df["min"].values[i * bins_length : min((i + 1) * bins_length, len(df))],
-            )
-            dict_results["MAPE (high)"] = mean_absolute_error(
-                df["reality"].values[
-                    i * bins_length : min((i + 1) * bins_length, len(df))
-                ],
-                df["max"].values[i * bins_length : min((i + 1) * bins_length, len(df))],
-            )
-            dict_results["Increasing"] = increasing[scenario]
             dict_results["Period"] = f"{i*bins_length} days - {(i+1)*bins_length} days"
+            dict_results["Increasing"] = increasing[scenario]
+            
+            # --- CORRECTED BLOCK START ---
+            # Define a clear mapping for each scenario we want to process
+            scenarios_to_process = [
+                {'col': 'med', 'mae_name': 'median', 'mape_name': 'median'},
+                {'col': 'min', 'mae_name': 'low',    'mape_name': 'optimist'},
+                {'col': 'max', 'mae_name': 'high',   'mape_name': 'pessimist'},
+                {'col': 'constant_baseline', 'mae_name': 'constant', 'mape_name': 'constant'},
+                {'col': 'damped_trend_baseline', 'mae_name': 'damped_trend', 'mape_name': 'damped_trend'},
+            ]
 
-            results[
-                f"Scenario: {scenario}, period: {i*bins_length} days - {(i+1)*bins_length} days".format(
-                    scenario
-                )
-            ] = list(dict_results.values())
+            for scenario_info in scenarios_to_process:
+                col_name = scenario_info['col']
+                mae_name = scenario_info['mae_name']
+                mape_name = scenario_info['mape_name']
 
-    return pd.DataFrame.from_dict(results, orient="index", columns=column_names).round(
-        1
-    )
+                # Define the exact keys that match the 'column_names' list
+                mae_key = f"MAE ({mae_name}, beds)"
+                mape_key = f"MAPE ({mape_name})"
+
+                if col_name in df_slice.columns:
+                    clean_slice = df_slice[['reality', col_name]].dropna()
+                    if not clean_slice.empty:
+                        dict_results[mae_key] = mean_absolute_error(clean_slice['reality'], clean_slice[col_name])
+                        dict_results[mape_key] = 100 * mean_absolute_percentage_error(clean_slice['reality'], clean_slice[col_name])
+                    else:
+                        dict_results[mae_key] = np.nan
+                        dict_results[mape_key] = np.nan
+                else:
+                    # Explicitly handle cases where a baseline column might be missing
+                    dict_results[mae_key] = np.nan
+                    dict_results[mape_key] = np.nan
+            # --- CORRECTED BLOCK END ---
+            
+            dict_results["Average uncertainty (beds)"] = np.mean(df_slice["max"] - df_slice["min"])
+
+            row_key = f"Scenario: {scenario}, period: {i*bins_length}-{(i+1)*bins_length} days"
+            results[row_key] = [dict_results.get(col, np.nan) for col in column_names]
+
+    return pd.DataFrame.from_dict(results, orient="index", columns=column_names).round(1)

@@ -1,17 +1,17 @@
-﻿,Average uncertainty (beds),"MAE (median, beds)","MAE (low, beds)","MAE (high, beds)",Historical peak,MAE (median),MAE (optimist),MAE (pessimist),MAPE (median),MAPE (optimist),MAPE (pessimist),Increasing,Date,Endpoint,Public,Valid assessment,Self-assessment by modelers
-Scenario: 2020/10/30 ICU ICU,47.9,1327.7,560.9,3393.3,70.0,19.0,8.0,48.5,35.0,15.2,96.5,True,2020/10/30,ICU,No,Yes,No
-Scenario: 2021/02/08 New hosp.,25.8,841.1,538.7,1323.8,30.4,27.7,17.7,43.5,67.6,42.8,108.0,True,2021/02/08,New hosp.,Yes,Yes,No
-Scenario: 2021/02/14 New hosp.,35.4,792.7,328.0,1403.9,30.4,26.1,10.8,46.2,62.4,26.5,109.4,True,2021/02/14,New hosp.,Yes,Yes,No
-Scenario: 2021/02/23 New hosp.,21.3,411.2,525.0,292.4,30.4,13.5,17.3,9.6,31.8,40.1,21.5,True,2021/02/23,New hosp.,Yes,Yes,No
-Scenario: 2021/04/26 New hosp.,16.0,463.4,252.9,738.4,30.4,15.2,8.3,24.3,122.7,60.2,213.2,False,2021/04/26,New hosp.,Yes,Yes,No
-Scenario: 2021/05/21 New hosp.,5.1,59.8,123.4,98.3,30.4,2.0,4.1,3.2,17.9,43.0,40.1,False,2021/05/21,New hosp.,Yes,Yes,Yes
-Scenario: 2021/05/21 ICU ICU,3.8,480.2,618.2,351.8,70.0,6.9,8.8,5.0,20.9,27.8,14.9,False,2021/05/21,ICU,Yes,Yes,Yes
-Scenario: 2021/07/26 ICU ICU,67.0,2286.4,485.5,5074.9,70.0,32.7,6.9,72.5,138.0,30.7,307.5,True,2021/07/26,ICU,Yes,Yes,No
-Scenario: 2021/07/26 New hosp.,54.9,1149.7,429.8,2099.0,30.4,37.8,14.1,69.0,345.1,119.3,653.0,True,2021/07/26,New hosp.,Yes,Yes,No
-Scenario: 2021/08/05 New hosp.,40.5,801.8,68.6,1245.1,30.4,26.4,2.3,41.0,234.6,17.6,371.4,True,2021/08/05,New hosp.,Yes,Yes,No
-Scenario: 2021/08/05 ICU ICU,64.2,1311.4,402.0,4090.7,70.0,18.7,5.7,58.4,77.9,25.0,248.8,True,2021/08/05,ICU,Yes,Yes,No
-Scenario: 2021/10/04 New hosp.,6.4,318.4,401.5,208.0,30.4,10.5,13.2,6.8,66.2,82.9,49.4,False,2021/10/04,New hosp.,Yes,Yes,No
-Scenario: 2022/01/07 New hosp.,42.0,1327.9,680.9,1956.5,30.4,43.7,22.4,64.4,63.9,33.0,93.7,True,2022/01/07,New hosp.,Yes,No,No
-Scenario: 2022/01/07 ICU ICU,22.5,1541.6,740.5,2300.0,70.0,22.0,10.6,32.9,60.0,29.7,86.7,True,2022/01/07,ICU,Yes,No,Yes
-Scenario: 2022/01/07 ICU,13.9,620.1,226.1,1132.3,70.0,8.9,3.2,16.2,17.6,6.3,32.3,True,2022/01/07,ICU,Yes,No,Yes
-Scenario: 2021/02/08 ICU,0.0,290.8,290.8,290.8,70.0,4.2,4.2,4.2,5.9,5.9,5.9,False,2021/02/08,ICU,Yes,No,Yes
+﻿,Average uncertainty (beds),"MAE (median, beds)","MAE (low, beds)","MAE (high, beds)","MAE (constant, beds)","MAE (damped_trend, beds)",Historical peak,MAE (median),MAE (optimist),MAE (pessimist),MAPE (median),MAPE (optimist),MAPE (pessimist),MAPE (constant),MAPE (damped_trend),Increasing,Date,Endpoint,Public,Valid assessment,Self-assessment by modelers
+Scenario: 2020/10/30 ICU ICU,3352.5,1327.7,560.9,3393.3,968.6,2572.6,70.0,19.0,8.0,48.5,35.0,15.2,96.5,22.3,77.4,True,2020/10/30,ICU,No,Yes,No
+Scenario: 2021/02/08 New hosp.,785.1,841.1,538.7,1323.8,119.4,351.3,30.4,27.7,17.7,43.5,67.6,42.8,108.0,9.7,26.9,True,2021/02/08,New hosp.,Yes,Yes,No
+Scenario: 2021/02/14 New hosp.,1075.9,792.7,328.0,1403.9,64.3,110.2,30.4,26.1,10.8,46.2,62.4,26.5,109.4,4.9,8.5,True,2021/02/14,New hosp.,Yes,Yes,No
+Scenario: 2021/02/23 New hosp.,646.4,411.2,525.0,292.4,161.7,68.5,30.4,13.5,17.3,9.6,31.8,40.1,21.5,11.8,4.8,True,2021/02/23,New hosp.,Yes,Yes,No
+Scenario: 2021/04/26 New hosp.,485.4,463.4,252.9,738.4,925.4,109.4,30.4,15.2,8.3,24.3,122.7,60.2,213.2,264.7,30.5,False,2021/04/26,New hosp.,Yes,Yes,No
+Scenario: 2021/05/21 New hosp.,154.8,59.8,123.4,98.3,253.6,40.9,30.4,2.0,4.1,3.2,17.9,43.0,40.1,101.1,17.4,False,2021/05/21,New hosp.,Yes,Yes,Yes
+Scenario: 2021/05/21 ICU ICU,266.5,480.2,618.2,351.8,1287.2,159.5,70.0,6.9,8.8,5.0,20.9,27.8,14.9,60.0,7.9,False,2021/05/21,ICU,Yes,Yes,Yes
+Scenario: 2021/07/26 ICU ICU,4690.3,2286.4,485.5,5074.9,846.3,631.6,70.0,32.7,6.9,72.5,138.0,30.7,307.5,49.7,36.4,True,2021/07/26,ICU,Yes,Yes,No
+Scenario: 2021/07/26 New hosp.,1669.2,1149.7,429.8,2099.0,209.0,445.8,30.4,37.8,14.1,69.0,345.1,119.3,653.0,43.7,177.7,True,2021/07/26,New hosp.,Yes,Yes,No
+Scenario: 2021/08/05 New hosp.,1231.1,801.8,68.6,1245.1,156.7,710.8,30.4,26.4,2.3,41.0,234.6,17.6,371.4,58.5,276.6,True,2021/08/05,New hosp.,Yes,Yes,No
+Scenario: 2021/08/05 ICU ICU,4492.7,1311.4,402.0,4090.7,420.2,420.2,70.0,18.7,5.7,58.4,77.9,25.0,248.8,23.1,23.1,True,2021/08/05,ICU,Yes,Yes,No
+Scenario: 2021/10/04 New hosp.,193.5,318.4,401.5,208.0,275.0,291.4,30.4,10.5,13.2,6.8,66.2,82.9,49.4,45.3,50.5,False,2021/10/04,New hosp.,Yes,Yes,No
+Scenario: 2022/01/07 New hosp.,1275.6,1327.9,680.9,1956.5,507.1,134.2,30.4,43.7,22.4,64.4,63.9,33.0,93.7,24.3,6.5,True,2022/01/07,New hosp.,Yes,No,No
+Scenario: 2022/01/07 ICU ICU,1575.7,1541.6,740.5,2300.0,961.7,1596.8,70.0,22.0,10.6,32.9,60.0,29.7,86.7,52.1,81.9,True,2022/01/07,ICU,Yes,No,Yes
+Scenario: 2022/01/07 ICU,974.6,620.1,226.1,1132.3,,,70.0,8.9,3.2,16.2,17.6,6.3,32.3,,,True,2022/01/07,ICU,Yes,No,Yes
+Scenario: 2021/02/08 ICU,0.0,290.8,290.8,290.8,,,70.0,4.2,4.2,4.2,5.9,5.9,5.9,,,False,2021/02/08,ICU,Yes,No,Yes

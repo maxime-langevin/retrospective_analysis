@@ -8,7 +8,7 @@ from retrospective_analysis.metrics import max_error, mean_difference
 from retrospective_analysis.evaluate_scenarios import (
     evaluate_all_scenarios,
     evaluate_all_scenarios_with_dates,
-    compute_metrics_all_scenarios,
+    compute_metrics_all_scenarios
 )
 
 # Set matplotlib style
@@ -41,12 +41,11 @@ sns.set(
 )
 
 # to change with path suited for you
-
 results_path = "results/"
 images_path = "images/"
 
 # divide by 100 to express as % of normalization
-new_hosp_normalization = 3040 / 100  # based on data from Paireau et al. publication
+new_hosp_normalization = 3040 / 100
 icu_normalization = 7000 / 100
 idf_icu_normalization = 2600 / 100
 
@@ -129,14 +128,14 @@ scenario_endpoints = [
 results = evaluate_all_scenarios(
     data_location, metrics=metrics, normalizations=normalizations, increasing=increasing
 )
-with open(results_path + "error_metrics.csv", "w", encoding="utf-8-sig") as f:
+with open(results_path + "error_metrics_with_baselines.csv", "w", encoding="utf-8-sig") as f:
     results.to_csv(f)
 
 results_with_dates = evaluate_all_scenarios_with_dates(
     data_location, metrics=metrics, normalizations=normalizations, increasing=increasing
 )
 with open(
-    results_path + "error_metrics_stratified_by_dates.csv", "w", encoding="utf-8-sig"
+    results_path + "error_metrics_stratified_by_dates_with_baselines.csv", "w", encoding="utf-8-sig"
 ) as f:
     results_with_dates.to_csv(f)
 
@@ -161,59 +160,18 @@ dates = list(normalizations.keys())
 dates = [x.split()[0] for x in dates]
 
 public = [
-    "No",
-    "Yes",
-    "Yes",
-    "Yes",
-    "Yes",
-    "Yes",
-    "Yes",
-    "Yes",
-    "Yes",
-    "Yes",
-    "Yes",
-    "Yes",
-    "Yes",
-    "Yes",
-    "Yes",
-    "Yes"
+    "No", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes",
+    "Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes"
 ]
 legitimate_comparisons = [
-    "Yes",
-    "Yes",
-    "Yes",
-    "Yes",
-    "Yes",
-    "Yes",
-    "Yes",
-    "Yes",
-    "Yes",
-    "Yes",
-    "Yes",
-    "Yes",
-    "No",
-    "No",
-    "No",
-    "No"
+    "Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes",
+    "Yes", "Yes", "Yes", "Yes", "No", "No", "No", "No"
 ]
 
 endpoints = [
-    "ICU",
-    "New hosp.",
-    "New hosp.",
-    "New hosp.",
-    "New hosp.",
-    "New hosp.",
-    "ICU",
-    "ICU",
-    "New hosp.",
-    "New hosp.",
-    "ICU",
-    "New hosp.",
-    "New hosp.",
-    "ICU",
-    "ICU",
-    "ICU"
+    "ICU", "New hosp.", "New hosp.", "New hosp.", "New hosp.", "New hosp.",
+    "ICU", "ICU", "New hosp.", "New hosp.", "ICU", "New hosp.",
+    "New hosp.", "ICU", "ICU", "ICU"
 ]
 
 
@@ -223,22 +181,8 @@ additional_information_df = pd.DataFrame(
     columns=["Date", "Endpoint", "Public", "Valid assessment"],
 )
 additional_information_df["Self-assessment by modelers"] = [
-    "No",
-    "No",
-    "No",
-    "No",
-    "No",
-    "Yes",
-    "Yes",
-    "No",
-    "No",
-    "No",
-    "No",
-    "No",
-    "No",
-    "Yes",
-    "Yes",
-    "Yes"
+    "No", "No", "No", "No", "No", "Yes", "Yes", "No",
+    "No", "No", "No", "No", "No", "Yes", "Yes", "Yes"
 ]
 
 additional_information_df.index = full_results.index
@@ -255,95 +199,63 @@ with open(
 # ------------------------------------------------------------------------------------------------------
 
 df_low_scenario = compute_metrics_all_scenarios(
-    data_location,
-    metrics=metrics,
-    normalizations=normalizations,
-    increasing=increasing,
-    scenario_name="min",
+    data_location, metrics=metrics, normalizations=normalizations, increasing=increasing, scenario_name="min"
 )
-df_low_scenario["endpoints"] = scenario_endpoints
-df_low_scenario["MAE (beds)"] = df_low_scenario["MAE"].values * np.array(
-    [endpoints_normalizations[x] for x in scenario_endpoints]
-)
-df_low_scenario["Max error (beds)"] = df_low_scenario["Max Error"].values * np.array(
-    [endpoints_normalizations[x] for x in scenario_endpoints]
-)
-
-print(
-    df_low_scenario.to_latex(
-        formatters={"name": str.upper}, float_format="{:.1f}".format
-    )
-)
-
 df_median_scenario = compute_metrics_all_scenarios(
-    data_location,
-    metrics=metrics,
-    normalizations=normalizations,
-    increasing=increasing,
-    scenario_name="med",
+    data_location, metrics=metrics, normalizations=normalizations, increasing=increasing, scenario_name="med"
 )
-df_median_scenario["endpoints"] = scenario_endpoints
-df_median_scenario["MAE (beds)"] = df_median_scenario["MAE"].values * np.array(
-    [endpoints_normalizations[x] for x in scenario_endpoints]
-)
-df_median_scenario["Max error (beds)"] = df_median_scenario[
-    "Max Error"
-].values * np.array([endpoints_normalizations[x] for x in scenario_endpoints])
-
-print(
-    df_median_scenario.to_latex(
-        formatters={"name": str.upper}, float_format="{:.1f}".format
-    )
-)
-
-
 df_high_scenario = compute_metrics_all_scenarios(
-    data_location,
-    metrics=metrics,
-    normalizations=normalizations,
-    increasing=increasing,
-    scenario_name="max",
+    data_location, metrics=metrics, normalizations=normalizations, increasing=increasing, scenario_name="max"
 )
-df_high_scenario["endpoints"] = scenario_endpoints
-df_high_scenario["MAE (beds)"] = df_high_scenario["MAE"].values * np.array(
-    [endpoints_normalizations[x] for x in scenario_endpoints]
+df_constant_baseline = compute_metrics_all_scenarios(
+    data_location, metrics=metrics, normalizations=normalizations, increasing=increasing, scenario_name="constant_baseline"
 )
-df_high_scenario["Max error (beds)"] = df_high_scenario["Max Error"].values * np.array(
-    [endpoints_normalizations[x] for x in scenario_endpoints]
+df_damped_trend = compute_metrics_all_scenarios(
+    data_location, metrics=metrics, normalizations=normalizations, increasing=increasing, scenario_name="damped_trend_baseline"
 )
 
-print(
-    df_high_scenario.to_latex(
-        formatters={"name": str.upper}, float_format="{:.1f}".format
-    )
-)
+all_dfs = [df_low_scenario, df_median_scenario, df_high_scenario, df_constant_baseline, df_damped_trend]
+for df in all_dfs:
+    if "MAE" in df.columns:
+        df["endpoints"] = scenario_endpoints
+        df["MAE (beds)"] = df["MAE"].values * np.array([endpoints_normalizations[x] for x in scenario_endpoints])
+    if "Max Error" in df.columns:
+        df["endpoints"] = scenario_endpoints
+        df["Max error (beds)"] = df["Max Error"].values * np.array([endpoints_normalizations[x] for x in scenario_endpoints])
 
 display_df = pd.concat(
     [
         df_low_scenario.assign(scenario="Optimist"),
         df_median_scenario.assign(scenario="Median"),
         df_high_scenario.assign(scenario="Pessimist"),
+        df_constant_baseline.assign(scenario="Constant Baseline"),
+        df_damped_trend.assign(scenario="Damped Trend"),
     ],
     axis=0,
 )
+
 display_df["Increasing"] = (
-    list(increasing.values()) + list(increasing.values()) + list(increasing.values())
+    list(increasing.values()) * 5
 )
 
 with open(
-    results_path + "error_metrics_stratified_by_scenario_types.csv",
+    results_path + "error_metrics_stratified_by_scenario_types_with_baselines.csv",
     "w",
     encoding="utf-8-sig",
 ) as f:
     display_df.to_csv(f)
 
-fig, ax = plt.subplots(figsize=(15, 15))
+fig, ax = plt.subplots(figsize=(18, 15))
 h = sns.boxplot(data=display_df, y="ME", x="scenario", ax=ax, hue="Increasing")
 
 ax.axhline(y=0, linestyle="--", c="g", label="Unbiased scenario")
 ax.set_ylabel("Mean Error")
+ax.set_xlabel("Scenario / Model")
+plt.xticks(rotation=15)
 plt.legend()
-"""
-fig_path = images_path + "/mean_error_by_scenario_type.pdf"
+plt.tight_layout()
+
+fig_path = images_path + "/mean_error_by_scenario_type_with_baselines.pdf"
 plt.savefig(fig_path, dpi=300, bbox_inches="tight")
-"""
+
+plt.show()
