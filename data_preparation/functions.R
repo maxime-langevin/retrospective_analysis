@@ -1,12 +1,13 @@
 #setting graphs theme
 theme_set(
   theme_classic() +
-    theme(panel.grid.major.y = element_line(),
-          text = element_text(family = "Times New Roman"),
-          plot.title = element_text(face="bold")
+    theme(
+      panel.grid.major.y = element_line(color = "gray", linewidth = 0.4), #no vertical lines by default
+      #panel.grid.minor.y = element_line(color = "gray", linewidth = 0.1),
+      text = element_text(family = "Times New Roman"),
+      plot.title = element_text(face="bold") #graphs titles in bolds
     )
 )
-
 
 # Prepare reality data ----------------------------------------------------
 

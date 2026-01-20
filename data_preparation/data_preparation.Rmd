@@ -540,6 +540,8 @@ knitr::include_graphics("source_data/2021_05_21/2021_05_21_fig3G.png")
 
 Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/variant/Institut_Pasteur_Acceleration_vaccination_et_Delta_20210726.pdf){target="_blank"}, July 26, 2021. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/delta-variant-dynamic/){target="_blank"}.
 
+We were unable to justify a clear choice between a 14-day and a 10-day ICU length of stay (Figures 5 and 6). Ultimately, we retained only the 10-day scenarios (Figure 6), as they are more favorable to the modelers.
+
 #### Reproduced 
 
 ```{r 2021_07_26_Pasteur_ICU_beds}
@@ -557,7 +559,15 @@ f_graph(
 ) 
 
 # save data
-temp <- f_prepare_to_save( scenarios,  reality_ICU_beds,  "ICU_beds")
+temp <- f_prepare_to_save(
+  scenarios %>%
+    select(
+      date, reality,
+      # keep only 10-day ICU length of stay
+      blue_full_10, blue_dashed_10, purple_full_10, purple_dashed_10, pink_full_10, pink_dashed_10 
+      ),  
+  reality_ICU_beds,  "ICU_beds"
+  )
 f_save_csv_files(temp, output_path, "2021_07_26_ICU.csv")
 ```
 
@@ -611,6 +621,8 @@ knitr::include_graphics("source_data/2021_07_26/2021_07_26_fig5.png")
 
 Source: [Pasteur report](https://modelisation-covid19.pasteur.fr/variant/InstitutPasteur_Dynamiques_regionales_des_hospitalisations_20210805.pdf){target="_blank"}, August 5, 2021. Identified on Pasteur Institute's website, on [this page](https://modelisation-covid19.pasteur.fr/realtime-analysis/delta-variant-dynamic/){target="_blank"}.
 
+We were unable to justify a clear choice between the 10, 14 or 17-day ICU length of stay. Ultimately, we retained only the 10-day scenarios, as they are more favorable to the modelers.
+
 #### Reproduced
 
 ```{r 2021_08_05_Pasteur_ICU_beds}
@@ -630,7 +642,13 @@ f_graph(
 ) 
 
 # save data
-temp <- f_prepare_to_save( scenarios,  reality_ICU_beds,  "ICU_beds")
+temp <- f_prepare_to_save(
+  scenarios %>% select(
+    date, reality,  
+    # keep only 10-day ICU length of stay
+    RedFull, BlueFull, PurpleFull, GreenFull
+    ),
+  reality_ICU_beds,  "ICU_beds")
 f_save_csv_files(temp, output_path, "2021_08_05_ICU.csv")
 ```
 
@@ -684,6 +702,11 @@ f_graph(
 # save data
 temp <- f_prepare_to_save(scenarios, reality_ICU_beds, "ICU_beds")
 f_save_csv_files(temp, output_path, "2022_01_07_ICU.csv")
+
+f_save_graph_pdf_png(
+  "../graphs/raw_comparisons/example_extraction",
+  5, 4, dpi_resolution
+)
 ```
 
 #### Error
@@ -1517,6 +1540,8 @@ g1_scenarios <- ggplot(data_ICU_beds) +
     )
 ```
 
+with colored errors
+
 ```{r}
 # combination of the 2 panes
 g1 <- g1_first_wave + g1_scenarios +
@@ -1529,6 +1554,101 @@ f_save_graph_pdf_png(
   "../graphs/raw_comparisons/all_ICU_scenarios_reality",
   7, 4, dpi_resolution
 )
+```
+
+without colored errors
+
+```{r}
+# --- ICU: same figure but without colored errors ---
+# - reality in red
+# - scenarios in grey (slightly darker)
+# - no error legend
+
+# pane of reality data only for 1st wave to show peak
+g1_first_wave_grey <- ggplot(reality_ICU_beds %>% filter(date < date_first_wave_max)) +
+  geom_line(
+    aes(date, ICU_beds),
+    color = "#ff0000"
+  ) +
+  geom_hline(
+    yintercept = max_ICU_beds,
+    linetype = "dashed"
+  ) +
+  annotate(
+    "text",
+    x = as.Date("2020-03-05"), y = max_ICU_beds,
+    label = "1st wave peak\nin April 2020",
+    color = "black", fontface = "italic", family = "Times New Roman",
+    vjust = -.2, hjust = 0
+  ) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank()
+  ) +
+  coord_cartesian(
+    expand = FALSE,
+    xlim = c(date_first_wave_min, NA),
+    ylim = c(0, NA)
+  ) +
+  labs(
+    x = element_blank(),
+    y = "ICU beds\noccupied by COVID patients"
+  )
+
+# pane of scenarios vs reality (no error colors)
+g1_scenarios_grey <- ggplot(data_ICU_beds) +
+  # dates of reports on x axis
+  geom_rug(
+    data = report_dates_ICU,
+    aes(report)
+  ) +
+  scale_x_continuous(
+    breaks = report_dates_ICU$place,
+    labels = format(report_dates_ICU$report, format = "%b %d, %Y")
+  ) +
+  # scenarios curves in grey (darker than before)
+  geom_line(
+    aes(date, value, group = interaction(scenario_type, report)),
+    color = "#B0B0B0",
+    linewidth = 1.5
+  ) +
+  # reality curve in red
+  geom_line(
+    data = reality_ICU_beds %>% filter(date > date_scenarios_min - 15),
+    aes(date, ICU_beds),
+    color = "#ff0000"
+  ) +
+  # annotation 1st wave peak in France
+  geom_hline(
+    yintercept = max_ICU_beds,
+    linetype = "dashed"
+  ) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.ticks.x = element_blank(),
+    axis.line.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  ) +
+  coord_cartesian(
+    expand = FALSE,
+    xlim = c(date_scenarios_min - 15, NA),
+    ylim = c(0, NA)
+  ) +
+  labs(
+    x = element_blank(),
+    y = element_blank()
+  )
+
+# combination of the 2 panes
+g1_grey <- g1_first_wave_grey + g1_scenarios_grey +
+  plot_layout(widths = c(first_wave_rel_duration, scenarios_rel_duration)) &
+  ylim(0, 12500)
+
+g1_grey
+
 ```
 
 
@@ -1671,6 +1791,8 @@ g2_scenarios <- ggplot(data_new_hosp) +
   ) 
 ```
 
+colored errors
+
 ```{r}
 g2 <- g2_first_wave + g2_scenarios + 
   plot_layout(widths = c(first_wave_rel_duration, scenarios_rel_duration)) & 
@@ -1684,8 +1806,118 @@ f_save_graph_pdf_png(
 )
 ```
 
+not colored
+
+```{r}
+# --- New hospitalizations: same figure but without colored errors ---
+# - reality in red
+# - scenarios in grey (slightly darker)
+# - no error legend
+
+# plot 1st wave (reality only)
+g2_first_wave_grey <- ggplot(reality_new_hosp_adm %>% filter(date < date_first_wave_max)) +
+  # smoothed reality in red
+  geom_line(
+    aes(date, new_hosp_smooth),
+    color = "#ff0000"
+  ) +
+  # unsmoothed reality in red (lighter via alpha)
+  geom_line(
+    aes(date, new_hosp),
+    color = "#ff0000", alpha = .2
+  ) +
+  # peak line
+  geom_hline(
+    yintercept = max_new_hosp,
+    linetype = "dashed"
+  ) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank()
+  ) +
+  coord_cartesian(
+    expand = FALSE,
+    xlim = c(date_first_wave_min, NA),
+    ylim = c(0, NA)
+  ) +
+  labs(
+    x = element_blank(),
+    y = "daily new hospital admissions\nrelated to COVID"
+  ) +
+  annotate(
+    "text",
+    x = as.Date("2020-03-05"), y = max_new_hosp,
+    label = "1st wave peak\nin April 2020",
+    color = "black", fontface = "italic", family = "Times New Roman",
+    vjust = -.2, hjust = 0
+  )
+
+# plot scenarios vs reality (no error colors)
+g2_scenarios_grey <- ggplot(data_new_hosp) +
+  # dates of reports on x axis
+  geom_rug(
+    data = report_dates_hosp,
+    aes(report)
+  ) +
+  scale_x_continuous(
+    breaks = report_dates_hosp$place,
+    labels = format(report_dates_hosp$report, format = "%b %d, %Y")
+  ) +
+  # un-smoothed reality (red, light)
+  geom_line(
+    data = reality_new_hosp_adm %>% filter(date > date_scenarios_min - 15),
+    aes(date, new_hosp),
+    color = "#ff0000", alpha = .2
+  ) +
+  # scenarios curves in grey (darker than before)
+  geom_line(
+    aes(date, value, group = interaction(scenario_type, report)),
+    color = "#B0B0B0",
+    linewidth = 1
+  ) +
+  # smoothed reality curve in red
+  geom_line(
+    data = reality_new_hosp_adm %>% filter(date > date_scenarios_min - 15),
+    aes(date, new_hosp_smooth),
+    color = "#ff0000"
+  ) +
+  # annotation peak 1st wave
+  geom_hline(
+    yintercept = max_new_hosp,
+    linetype = "dashed"
+  ) +
+  coord_cartesian(
+    expand = FALSE,
+    xlim = c(date_scenarios_min - 15, NA),
+    ylim = c(0, NA)
+  ) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.ticks.x = element_blank(),
+    axis.line.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  ) +
+  labs(
+    x = element_blank(),
+    y = element_blank()
+  )
+
+g2_grey <- g2_first_wave_grey + g2_scenarios_grey +
+  plot_layout(widths = c(first_wave_rel_duration, scenarios_rel_duration)) &
+  ylim(0, 5500)
+
+g2_grey
+
+```
+
+
 
 ### Both
+
+colored errors
 
 ```{r graph_all_combined}
 #get common legend
@@ -1719,6 +1951,82 @@ f_save_graph_pdf_png(
   "../graphs/raw_comparisons/all_scenarios_reality",
   8, 8, dpi_resolution
 )
+```
+
+not colored errors
+
+```{r}
+# --- Combine ICU + New Hosp (no error colors) WITH a legend (reality vs scenarios) ---
+# Assumes you already created:
+#   g1_first_wave_grey, g1_scenarios_grey
+#   g2_first_wave_grey, g2_scenarios_grey
+
+label_scenarios <- "\nScenarios\ncomparable\nto reality"
+
+# 1) Add a legend on ONE panel only (here: g2_scenarios_grey), and remove elsewhere
+cols_legend <- setNames(
+  c("#ff0000", "#B0B0B0"),
+  c("Reality", label_scenarios)
+)
+
+g1_scenarios_grey <- g1_scenarios_grey + theme(legend.position = "none")
+
+g2_scenarios_grey_leg <- g2_scenarios_grey +
+  aes(color = NULL) +
+  # Map colors to labels via invisible mapping (keeps geometry unchanged)
+  geom_line(
+    data = data_new_hosp %>% slice(1),
+    aes(date, value, color = label_scenarios),
+    alpha = 0
+  ) +
+  geom_line(
+    data = reality_new_hosp_adm %>% slice(1),
+    aes(date, new_hosp_smooth, color = "Reality"),
+    alpha = 0
+  ) +
+  scale_color_manual(
+    values = cols_legend,
+    breaks = c("Reality", label_scenarios),
+    name = ""
+  ) +
+  guides(
+    color = guide_legend(override.aes = list(alpha = 1, linewidth = 1.5))
+  ) +
+  theme(legend.position = "right")
+
+# Extract legend, then remove legend from plot panel
+leg <- get_legend(g2_scenarios_grey_leg)
+g2_scenarios_grey_noleg <- g2_scenarios_grey + theme(legend.position = "none")
+
+# 2) Build the two combined rows (ICU / hosp)
+g1_b_grey <-
+  g1_first_wave_grey + labs(y = element_blank()) +
+  g1_scenarios_grey + labs(x = element_blank()) +
+  plot_annotation(subtitle = "Intensive Care Units beds") +
+  plot_layout(widths = c(first_wave_rel_duration, scenarios_rel_duration)) &
+  ylim(0, 12500)
+
+g2_b_grey <-
+  g2_first_wave_grey + labs(y = element_blank()) +
+  g2_scenarios_grey_noleg + labs(x = "publication dates of the reports") +
+  plot_annotation(subtitle = "New Hospital Admissions") +
+  plot_layout(widths = c(first_wave_rel_duration, scenarios_rel_duration)) &
+  ylim(0, 5500)
+
+# 3) Combine with legend column
+plot_grid(
+  plot_grid(g1_b_grey, g2_b_grey, nrow = 2),
+  leg,
+  ncol = 2,
+  rel_widths = c(.85, .15)
+)
+
+# save
+f_save_graph_pdf_png(
+  "../graphs/raw_comparisons/all_scenarios_reality_no_error_colors",
+  8, 6, dpi_resolution
+)
+
 ```
 
 
@@ -1895,22 +2203,22 @@ f_graph_short_term_changes <-
     #graph
     g <- ggplot(temp2) +
       geom_line(
-        aes(date, value, group=scenario_type, color="scenarios"), 
+        aes(date, value, group=scenario_type, color="Scenarios\ncomparable\nto reality"), 
         linewidth=1
         ) +
       geom_line(
         data = reality_new_hosp_adm,
-        aes(date, new_hosp, color="reality"), 
+        aes(date, new_hosp, color="Reality"), 
         alpha=.2
         ) +
       geom_line(
         data = reality_new_hosp_adm,
-        aes(date, new_hosp_smooth, color="reality"), 
+        aes(date, new_hosp_smooth, color="Reality"), 
         linewidth=1
         ) +
       geom_vline(data = temp, aes(xintercept = x), linetype="dashed") +
       facet_wrap(vars(report), nrow=1) +
-      scale_color_manual(values=c('#ff0000','#D8D8D8')) +
+      scale_color_manual(values=c('#ff0000','#B0B0B0')) +
       labs(
         x=element_blank(), y="hospital admissions", color=element_blank()
       )
@@ -2036,162 +2344,12 @@ f_save_graph_pdf_png(
 
 
 
-# Debatable Winter 2021 scenarios
+
+```{r}
+rm(list = ls())
+```
 
 
-
-
-<!-- ```{r output_path_for_corrected_hospital_scenarios} -->
-<!-- # where prepared new hosp data is saved -->
-<!-- output_path <- "output_data/extracted_data/new_hosp_scenarios/" -->
-<!-- output_path_error <- "output_data/min_med_max_and_error/new_hosp_error/" -->
-<!-- ``` -->
-
-<!-- ```{r reality_new_hosp_daily_to_weekly} -->
-<!-- #some scenarios report data on weekly and not daily basis -->
-<!-- #for reality dataset, transform daily data to weekly data, to compare to scenarios -->
-<!-- temp2 <- reality_new_hosp_adm %>% -->
-<!--   select(date,new_hosp) %>% -->
-<!--   mutate( -->
-<!--     date = ISOweek(date), -->
-<!--     date = ISOweek2date(paste0(date, "-4")) -->
-<!--     ) %>% -->
-<!--   group_by(date) %>% -->
-<!--   summarise(new_hosp = sum(new_hosp, na.rm=T))  -->
-<!-- ``` -->
-
-
-<!-- ### January 16, 2021 {.tabset .tabset-fade .tabset-pills} -->
-
-<!-- Source: [EPIcx report 26](https://www.epicx-lab.com/uploads/9/6/9/4/9694133/inserm_covid-19-voc_dominance-20210116.pdf){target="_blank"}, January 16, 2021. Identified on EPIcx lab [webpage](https://www.epicx-lab.com/covid-19-pandemic-response.html){target="_blank"}. -->
-
-<!-- #### Reproduced -->
-
-<!-- ```{r 2021_01_16} -->
-<!-- #careful, original data reported per week, have to transform it -->
-<!-- scenarios <- read_csv("source_data/2021_01_16/new_hosp_weekly.csv") -->
-<!-- scenarios$date <- paste0(scenarios$date, "-4") #add number 4 to date, fo "Wednesday" -->
-<!-- scenarios$date <- ISOweek2date(scenarios$date) #transform weeks numbers into dates -->
-
-<!-- #graph comparison -->
-<!-- f_graph( -->
-<!--   temp2, scenarios, # reality and scenarios datasets -->
-<!--   "new_hosp", # variable of interest -->
-<!--   "2021-01-16", 1000, #publication date label -->
-<!--   "2020-10-01", "2021-05-01", #date limits on x axis -->
-<!--   NA, # y axis limits -->
-<!--   "weekly hospital admissions", # y label -->
-<!--   "reality in Paireau et al." # reality label -->
-<!-- ) -->
-
-<!-- #prepare and save data -->
-<!-- temp <- f_prepare_to_save(scenarios, temp2, "new_hosp") -->
-<!-- temp <- temp %>%  -->
-<!--   mutate(across(-c(date), function(x) x/7)) %>% #weekly hosp transformed in daily hosp -->
-<!--   filter(date <= as.Date("2021-03-22")) #stop comparison before 3rd lockdown, on March 22nd -->
-
-<!-- #since only 1 point per week, we linearly extrapolate missing days -->
-<!-- temp <- left_join( -->
-<!--   #add missing days by join -->
-<!--   data_frame(date = seq(as.Date(min(temp$date)), max(temp$date), by="days")), -->
-<!--   temp,  -->
-<!--   by="date" -->
-<!--   ) %>% -->
-<!--   #linear extrapolation on missing values -->
-<!--   mutate(across(-date, ~na.approx(.x, na.rm=F))) -->
-
-<!-- #save -->
-<!-- f_save_csv_files(temp, output_path, "2021_01_16_new_hosp.csv") -->
-<!-- ``` -->
-
-<!-- #### Error -->
-
-<!-- ```{r} -->
-<!-- #compute error and min med max scenarios -->
-<!-- error <- f_compute_error("2020-10-01", "2021-05-01", temp, max_new_hosp) -->
-
-<!-- f_graph_error( -->
-<!--   error, -->
-<!--   "2021-01-16", 50 #publication date label -->
-<!--   ) -->
-
-<!-- f_save_csv_files(error, output_path_error, "2021_01_16_new_hosp_error.csv") -->
-<!-- ``` -->
-
-<!-- #### Original {.tabset .tabset-fade} -->
-
-<!-- ##### Fig 1 -->
-
-<!-- ```{r 2021_01_16_original, echo=FALSE, out.width="100%"} -->
-<!-- knitr::include_graphics("source_data/2021_01_16/2021_01_16.png") -->
-<!-- ``` -->
-
-
-<!-- ### February 2, 2021 {.tabset .tabset-fade .tabset-pills} -->
-
-<!-- Source: [EPIcx report 28](https://www.epicx-lab.com/uploads/9/6/9/4/9694133/inserm-covid-19-voc-lockdown-20210202.pdf){target="_blank"}, February 2, 2021. Identified on EPIcx lab [webpage](https://www.epicx-lab.com/covid-19-pandemic-response.html){target="_blank"}. -->
-
-<!-- #### Reproduced  -->
-
-<!-- ```{r 2021_02_02_EPIcx} -->
-<!-- #careful, original data reported per week, have to transform it -->
-<!-- scenarios <- read_csv("source_data/2021_02_02/new_hosp_weekly.csv") -->
-<!-- scenarios$date <- paste0(scenarios$date, "-4") #add number 4 to date, fo "Wednesday" -->
-<!-- scenarios$date <- ISOweek2date(scenarios$date) #transform weeks numbers into dates -->
-
-<!-- #graph comparison -->
-<!-- f_graph( -->
-<!--   temp2, scenarios, # reality and scenarios datasets -->
-<!--   "new_hosp", # variable of interest -->
-<!--   "2021-02-02", 1000, # publication date label -->
-<!--   "2020-10-01", "2021-05-01", # date limits x axis -->
-<!--   NA, # y axis limits -->
-<!--   "weekly hospital admissions", # y label -->
-<!--   "reality in Paireau et al." # reality label -->
-<!-- ) -->
-
-<!-- #prepare to save data -->
-<!-- temp <- f_prepare_to_save(scenarios, temp2, "new_hosp") -->
-
-<!-- #date limits of comparison -->
-<!-- temp <- temp %>% mutate(across(-c(date), function(x) x/7)) %>% #weekly hosp transformed in daily hosp -->
-<!--     filter(date <= as.Date("2021-03-22")) #stop comparison before 3rd lockdown, on March 22nd -->
-
-<!-- #since only 1 point per week, we linearly extrapolate missing days -->
-<!-- temp <- left_join( -->
-<!--   #add missing days by join -->
-<!--   data_frame(date = seq(as.Date(min(temp$date)), max(temp$date), by="days")), -->
-<!--   temp,  -->
-<!--   by="date" -->
-<!--   ) %>% -->
-<!--   #linear extrapolation on missing values -->
-<!--   mutate(across(-date, ~na.approx(.x, na.rm=F))) -->
-
-<!-- #save -->
-<!-- f_save_csv_files(temp, output_path, "2021_02_02_new_hosp.csv") -->
-<!-- ``` -->
-
-
-<!-- #### Error -->
-
-<!-- ```{r} -->
-<!-- error <- f_compute_error("2020-10-01", "2021-05-01", temp, max_new_hosp) -->
-
-<!-- f_graph_error( -->
-<!--   error, -->
-<!--   "2021-02-02", 50 #publication date label -->
-<!--   ) -->
-
-<!-- f_save_csv_files(error, output_path_error, "2021_02_02_new_hosp_error.csv") -->
-<!-- ``` -->
-
-<!-- #### Original {.tabset .tabset-fade} -->
-
-<!-- ##### Fig 2 -->
-
-<!-- ```{r 2021_02_02_original, echo=FALSE, out.width="100%"} -->
-<!-- knitr::include_graphics("source_data/2021_02_02/2021_02_02.png") -->
-<!-- ``` -->
 
 
 
